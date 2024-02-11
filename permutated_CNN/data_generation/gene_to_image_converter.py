@@ -65,7 +65,7 @@ def create_gene_image_dataset_with_permutation(profiles, result_permutations):
     return np.array(images)
 
 
-def create_gene_image_dataset_plain(profiles, duplicates_number):
+def create_gene_image_dataset_duplicates(profiles, duplicates_number):
     images = []
     for gene_i in tqdm(range(int(profiles.shape[1]/ 5))):
         gene_image = get_single_gene_duplicates(profiles, gene_i * 5, duplicates_number)
