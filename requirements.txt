@@ -1,0 +1,4 @@
+pyfiglet==1.0.2
+tensorboardX==2.6.2.2
+torch==2.2.0
+scikit-learn==1.4.0

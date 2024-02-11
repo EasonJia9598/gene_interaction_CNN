@@ -1,25 +1,26 @@
-python ./permutated_CNN/scripts/train.py \
-    --main_dir /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
-    --epochs 100000 \
-    --batch_size 64 \
-    --num_outputs 10 \
-    --sub_training_batch 10 \
-    --input_gene_image_size "1, 100, 200" \
-    --gene_image_type 1
+# python ./permutated_CNN/scripts/train.py \
+#     --main_dir /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
+#     --epochs 100000 \
+#     --batch_size 64 \
+#     --num_outputs 10 \
+#     --sub_training_batch 5 \
+#     --input_gene_image_size "1, 100, 200" \
+#     --gene_image_type 1
 
 
 # gene_image_type 1 for duplicates images, 0 for permutated images
 
 
 
-# python ./permutated_CNN/scripts/train.py \
-#     --main_dir /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
-#     --epochs 100000 \
-#     --batch_size 64 \
-#     --num_outputs 10 \
-#     --sub_training_batch 10 \
-#     --input_gene_image_size "1, 100, 600" \
-#     --gene_image_type 0
+python ./permutated_CNN/scripts/train.py \
+    --main_dir /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
+    --epochs 100000 \
+    --batch_size 64 \
+    --num_outputs 10 \
+    --sub_training_batch 5 \
+    --input_gene_image_size "1, 100, 600" \
+    --gene_image_type 0 \
+    --log_file_name "Permutated_CNN_200K"
 
 
 

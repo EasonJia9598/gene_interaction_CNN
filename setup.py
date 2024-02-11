@@ -10,7 +10,7 @@ setup(
     description='A Python package for permutated CNN models',
     #  Add torch in the future with sepcific version in requirements.txt
     install_requires=['numpy', 'pandas', 
-                      'tqdm', 'matplotlib', 'seaborn', 'scikit-learn'],
+                      'tqdm', 'matplotlib', 'seaborn'],
     # url='https://github.com/yourusername/permutated_CNN',
     # long_description='Read more about the package here...',
 )

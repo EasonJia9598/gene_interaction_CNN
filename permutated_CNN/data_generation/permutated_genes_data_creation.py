@@ -5,7 +5,7 @@ from permutated_CNN.data_generation.gene_to_image_converter import *
 def extract_numeric_part(filename):
     return int(''.join(filter(str.isdigit, filename)))
 
-def concatenate_gene_rates(num_batches, files, raw_data_path, _epochs, saving_folder):
+def concatenate_gene_rates(files, raw_data_path, _epochs, saving_folder):
     index = 1
     dataframes = []
     for file in files:
@@ -19,8 +19,8 @@ def concatenate_gene_rates(num_batches, files, raw_data_path, _epochs, saving_fo
     concatenated_data = pd.concat(dataframes,  axis=0)
     concatenated_data.to_csv(f'{saving_folder}/{_epochs}_concatenated_rates.csv', index=False)
 
-def concatenate_permutated_gene_profiles(num_batches, files, raw_data_path, _epochs, permuations_result, saving_folder):
-    progress_bar = tqdm(total=num_batches, desc='Generating Files')
+def concatenate_permutated_gene_profiles(files, raw_data_path, _epochs, permuations_result, saving_folder):
+    progress_bar = tqdm(total=len(files), desc='Generating Files')
     file_index = 0 
     for file in files:
         file_path = os.path.join(raw_data_path, file)
@@ -42,8 +42,8 @@ def concatenate_permutated_gene_profiles(num_batches, files, raw_data_path, _epo
     np.save(f'{saving_folder}/{_epochs}_random_tree_permutated_gene_image.npy', previous_gene_image)
 
 
-def concatenate_duplicates_gene_profiles(num_batches, files, raw_data_path, _epochs, saving_folder):
-    progress_bar = tqdm(total=num_batches, desc='Generating Files')
+def concatenate_duplicates_gene_profiles(files, raw_data_path, _epochs, saving_folder):
+    progress_bar = tqdm(total=len(files), desc='Generating Files')
     file_index = 0 
     for file in files:
         file_path = os.path.join(raw_data_path, file)
@@ -95,12 +95,12 @@ def combine_rates(directory, file_name_pattern, number_of_rates_in_one_gene_imag
 
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
-        concatenate_gene_rates(num_batches, sub_files, raw_data_path, _epochs, saving_folder)
+        concatenate_gene_rates(sub_files, raw_data_path, _epochs, saving_folder)
 
     # In case there are more files than the number of gene arrays
     if len(files) > number_of_gene_arrays * num_batches:
         sub_files = files[number_of_gene_arrays * num_batches:]
-        concatenate_gene_rates(num_batches, sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
+        concatenate_gene_rates(sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
 
 def create_permutated_gene_images(directory, profile_file_name_pattern, number_of_profiles_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
     # Specify the directory where your files are located
@@ -136,12 +136,12 @@ def create_permutated_gene_images(directory, profile_file_name_pattern, number_o
 
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
-        concatenate_permutated_gene_profiles(num_batches, sub_files, raw_data_path, _epochs, permuations_result, saving_folder)
+        concatenate_permutated_gene_profiles(sub_files, raw_data_path, _epochs, permuations_result, saving_folder)
 
     # In case there are more files than the number of gene arrays
     if len(files) > number_of_gene_arrays * num_batches:
         sub_files = files[number_of_gene_arrays * num_batches:]
-        concatenate_permutated_gene_profiles(num_batches, sub_files, raw_data_path, number_of_gene_arrays, permuations_result, saving_folder)
+        concatenate_permutated_gene_profiles(sub_files, raw_data_path, number_of_gene_arrays, permuations_result, saving_folder)
 
 
 
@@ -175,12 +175,12 @@ def create_duplicates_gene_images(directory, profile_file_name_pattern, number_o
 
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
-        concatenate_duplicates_gene_profiles(num_batches, sub_files, raw_data_path, _epochs, saving_folder)
+        concatenate_duplicates_gene_profiles(sub_files, raw_data_path, _epochs, saving_folder)
 
     # In case there are more files than the number of gene arrays
     if len(files) > number_of_gene_arrays * num_batches:
         sub_files = files[number_of_gene_arrays * num_batches:]
-        concatenate_duplicates_gene_profiles(num_batches, sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
+        concatenate_duplicates_gene_profiles(sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
 
 
 

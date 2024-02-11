@@ -1,12 +1,9 @@
 
 from permutated_CNN.model.CNN_structure import *
-
 import argparse
 ## Pytorch Version
 import pandas as pd 
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from tqdm import tqdm
 import pandas as pd
 import os
@@ -14,6 +11,22 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.model_selection import train_test_split
 import copy
 from tensorboardX import SummaryWriter
+import pyfiglet
+from datetime import datetime
+
+def generate_doom_ascii(text):
+        try:
+            # Create a Figlet font object with the DOOM font style
+            doom_font = pyfiglet.Figlet(font='doom')
+
+            # Generate the ASCII art from the input text using the DOOM font
+            ascii_art = doom_font.renderText(text)
+
+            return ascii_art
+
+        except pyfiglet.FontNotFound:
+            return "DOOM font not found. Please make sure you have the DOOM font installed."
+        
 
 
 
@@ -42,6 +55,7 @@ def main():
     parser.add_argument("--sub_training_batch", type=int, default=10, help="Number of sub-training batches")
     parser.add_argument('--input_gene_image_size', metavar='N', type=str, help='Three integers for the input gene image size in double quotation mark. Ex: \"1, 100, 600\"')
     parser.add_argument("--gene_image_type", type=int, default=0, help="gene image type, 0 for permutated gene images, 1 for duplicates gene images")
+    parser.add_argument("--log_file_name", type=str, default="Permutated_CNN", help="Log file name")
     args = parser.parse_args()
 
     directory = args.main_dir
@@ -50,10 +64,19 @@ def main():
         gene_data_dir = f"{directory}/gene_images/permutated_gene_images/"
     else:
         gene_data_dir = f"{directory}/gene_images/duplicates_gene_images/"
-        
+
     rates_data_dir = f"{directory}/concatenated_data/"
-    model_dir = f"{directory}/model_checkpoints/"
-    log_dir = f"{directory}/logs/"
+
+    log_file_name = args.log_file_name
+
+
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%m_%d_%H_%M_%S")
+    
+    log_dir = f"{directory}/logs/{formatted_time}_{log_file_name}"
+    model_dir = f"{directory}/model_checkpoints/{formatted_time}_{log_file_name}"
+    
+    
     num_outputs = args.num_outputs
 
     num_epochs = args.epochs
@@ -95,21 +118,21 @@ def main():
 
     try:
         print("Create log directory")
+        os.mkdir(log_dir)
         os.mkdir(log_trending)
+        print("Log directory created")
     except:
         print("Directory already exists")
 
     try:
-         print("Create model directory")
-         os.mkdir(model_dir)
+        print("Create model directory")
+        os.mkdir(model_dir)
+        print("Model directory created")
     except:
         print("Directory already exists")
 
 
     _summ_writer = SummaryWriter(log_trending, flush_secs=1, max_queue=1)
-
-    # For tensorboard logger
-    runs_tracking = 0
 
 
     print("Load Validation and Test Data")
@@ -117,14 +140,16 @@ def main():
     X = np.load(gene_data_dir + gene_profiles_files[-1])[:, None, :, :]
     y = pd.read_csv(rates_data_dir + gene_rates_files[-1]).iloc[:, -num_outputs:].values
     
-    delet_x, X, delet_y, y = train_test_split(X, y, test_size=0.1, random_state=42)
+    # only take 6000 samples for validation and testing
+    X = X[:6000]
+    y = y[:6000]
 
     X_val, X_test, y_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
     # Free memory space
     del X, y
-    del delet_x, delet_y
+    # del delet_x, delet_y
 
     # save as pytorch data loader
     val_dataset = RegressionDataset(X_val, y_val)
@@ -144,19 +169,26 @@ def main():
 
     for Gen in range(num_epochs):
 
+        print("####################################################################")
+        print(f"Train {Gen} th epoch")
+        print(generate_doom_ascii(f"Train {Gen} th epoch"))
+        print("####################################################################")
         whole_run_loss = 0.0
+
+        # For tensorboard tracking
+        runs_tracking = Gen * sub_training_batch
 
         # for file_id in range(len(gene_profiles_files)):
         for file_id in range(len(gene_profiles_files) - 1):
-
-            # For tensorboard logger
-            runs_tracking += 1
             print("####################################################################")
             print(f"Train {file_id + 1} th batch")
+            print(generate_doom_ascii(f"Train {file_id + 1} th batch"))
+            print("####################################################################")
 
+            # Load the data
+            print("Load Batch Data")
             gene_image_df = np.load(gene_data_dir + gene_profiles_files[file_id])
             rates = pd.read_csv(rates_data_dir + gene_rates_files[file_id])
-
             rates = rates.iloc[:, -num_outputs:]
 
             print('rates.shape:', rates.shape)
@@ -185,6 +217,10 @@ def main():
             del gene_image_df
 
             for epoch in range(sub_training_batch):
+                
+                # For tensorboard logger
+                runs_tracking += 1
+
                 # Training
                 model.train()
                 num_batches = len(train_dataloader)
@@ -226,7 +262,7 @@ def main():
                 # _summ_writer.add_scalar('{}'.format('Val_Loss'), val_loss, epoch)
                 # _summ_writer.add_scalar('{}'.format('Training_Loss'), training_loss, epoch) 
 
-                _summ_writer.add_scalars('{}'.format('batch_loss'), {
+                _summ_writer.add_scalars('{}'.format(f'{file_id + 1}_th_batch_loss'), {
                         'Val_Loss': val_loss,
                         'Training_Loss': training_loss,
                 }, runs_tracking)
@@ -240,7 +276,7 @@ def main():
                     torch.save(batch_best_model.state_dict(), f"{model_dir}/batch_best_model.pth")
                     best_MSE = val_loss
 
-                print(f'Gen {Gen} Batch Epoch {epoch+1}/{sub_training_batch}, Loss: {loss.item():.4f}, Val Loss: {val_loss:.4f}')
+                print(f'Gen {Gen}: Batch {file_id + 1} {epoch+1}/{sub_training_batch}, Loss: {loss.item():.4f}, Val Loss: {val_loss:.4f}')
 
                 if early_stopping < 0:
                     print("####################################################################")
@@ -258,35 +294,17 @@ def main():
         if whole_run_loss <= Early_stopping_MSE:
             print("####################################################################")
             print(f'Find new whole run best model at {whole_run_loss}')
+            print(generate_doom_ascii(f'Find new whole run best model at {whole_run_loss}'))
             print("####################################################################")
             best_model = copy.deepcopy(model)
             # Save the best model
             torch.save(best_model.state_dict(), f"{model_dir}/whole_run_best_model.pth")
             Early_stopping_MSE = whole_run_loss
         else:
+            print("####################################################################")
+            print(f'No improvement at {whole_run_loss}')
+            print("####################################################################")
             early_stopping -= 1
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
