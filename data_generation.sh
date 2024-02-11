@@ -1,12 +1,12 @@
 python ./permutated_CNN/scripts/generate_data.py \
-    --directory /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
-    --profile_file_name_pattern profiles_data_5_genes_2500_records.csv \
-    --rates_file_name_pattern rates_data_5_genes_2500_records.csv \
+    --directory /media/eeepc/3866FF5566FF127C/random_tree_data/random_tree_5_genes_2400000_records_2024_02_10_23_29_40 \
+    --profile_file_name_pattern profiles.csv \
+    --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 32 \
-    --generation_type 0 \
+    --generation_type 2 \
     --cut_off_files 0 \
     --total_files_to_convert 32 \
-    --gene_image_type 0
+    --gene_image_type 1
 
 
 

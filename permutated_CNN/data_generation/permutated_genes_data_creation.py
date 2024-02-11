@@ -194,9 +194,9 @@ def data_generation(directory, profile_file_name_pattern, rates_file_name_patter
     '''
 
     try:
-        os.mkdir(f'{directory}/concatenated_data')
+        # os.mkdir(f'{directory}/concatenated_data')
         os.mkdir(f'{directory}/gene_images')
-        print("Directory created successfully")
+        print("gene_images Directory created successfully")
     except:
         print("Directory already exists")
 
