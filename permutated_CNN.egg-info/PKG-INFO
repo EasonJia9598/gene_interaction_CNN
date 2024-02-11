@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: permutated-CNN
+Version: 0.1.0
+Summary: A Python package for permutated CNN models
+Author: Zesheng Jia
+Author-email: will.jia.sheng@gmail.com
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: tqdm
+Requires-Dist: matplotlib
+Requires-Dist: seaborn
+Requires-Dist: scikit-learn
