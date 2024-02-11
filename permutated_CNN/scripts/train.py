@@ -156,11 +156,30 @@ def main():
 
     _summ_writer = SummaryWriter(log_trending, flush_secs=1, max_queue=1)
 
-    # print("Load First Batch Data")
-    # Define the terminal command you want to run
-    # terminal_command = "cp " + gene_data_dir + gene_profiles_files[0] + " " +   temperary_ssd_dr 
-    # Execute the terminal command in the background
-    # process = subprocess.Popen(terminal_command, shell=True)
+    # In order to maxiumn the speed of SSD loading, we will load the first batch of data to the SSD
+    first_atch_file = f"{temperary_ssd_dr}/{gene_profiles_files[0]}"
+
+    if os.path.exists(first_atch_file):
+        print("First batch Data File exists")
+    else:
+        print("Copy First Batch Data to SSD")
+        # Define the terminal command you want to run
+        terminal_command = "cp " + gene_data_dir + gene_profiles_files[0] + " " +   temperary_ssd_dr 
+        # Execute the terminal command in the background
+        process = subprocess.Popen(terminal_command, shell=True)
+
+
+    validation_test_data_path = temperary_ssd_dr + '/' + gene_profiles_files[-1]
+
+    if os.path.exists(validation_test_data_path):
+        print("Validation Data File exists")
+    else:
+        print("Copy Validation Batch Data to SSD")
+        # Define the terminal command you want to run
+        terminal_command = "cp " + gene_data_dir + gene_profiles_files[-1] + " " +   temperary_ssd_dr 
+        # Execute the terminal command in the background
+        process_val = subprocess.Popen(terminal_command, shell=True)
+    print("Please wait for the first batch data to be loaded to the SSD")
 
 
     print("Load Validation and Test Data")
@@ -171,7 +190,9 @@ def main():
     X = X[:, None, :, :]
     y = pd.read_csv(rates_data_dir + gene_rates_files[-1]).iloc[:, -num_outputs:].values
 
-    # process.wait()
+    process.wait()
+    process_val.wait()
+
     print("Success!")
     
     # only take 6000 samples for validation and testing
