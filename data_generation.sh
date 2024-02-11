@@ -6,9 +6,7 @@ python ./permutated_CNN/scripts/generate_data.py \
     --generation_type 2 \
     --cut_off_files 0 \
     --total_files_to_convert 32 \
-    --gene_image_type 1
-
-
+    --gene_image_type 0
 
 #     parser.add_argument('--directory', type=str, help='directory for the raw data')
 #     parser.add_argument('--profile_file_name_pattern', type=str, help='pattern for the profile file names')

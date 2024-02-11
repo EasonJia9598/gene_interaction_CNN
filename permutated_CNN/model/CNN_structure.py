@@ -59,7 +59,7 @@ class RegressionCNN(nn.Module):
         # x = torch.relu(self.fcx4(x))
         # x = torch.relu(self.fcx5(x))
         # x = torch.tanh(self.fc2(x))
-        x = self.dropout2(x)
+        # x = self.dropout2(x)
         x = self.fc3(x)
 
         return x
