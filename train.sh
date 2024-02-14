@@ -4,10 +4,13 @@ python ./permutated_CNN/scripts/train.py \
     --epochs 100000 \
     --batch_size 64 \
     --num_outputs 10 \
-    --sub_training_batch 12 \
+    --sub_training_batch 6 \
     --input_gene_image_size "1, 100, 200" \
     --gene_image_type 1 \
-    --log_file_name "duplicates_CNN_2_Million_10_epochs_1_batch_no_dropout"
+    --log_file_name "duplicates_ResNet_34_no_dropout_1e4" \
+    --model_type "ResNet" \
+    --ResNet_depth 34 \
+    --learning_rate 1e-3 \
 
 
 # gene_image_type 1 for duplicates images, 0 for permutated images
@@ -34,3 +37,4 @@ python ./permutated_CNN/scripts/train.py \
     # parser.add_argument("--sub_training_batch", type=int, default=10, help="Number of sub-training batches")
     # parser.add_argument('--input_gene_image_size', metavar='N', type=str, nargs=3, help='Three integers for the input gene image size. Ex: \'(1, 100, 600)\'')
     # parser.add_argument("--gene_image_type", type=int, default=0, help="gene image type, 0 for permutated gene images, 1 for duplicates gene images")
+    #  parser.add_argument("--model_type", type=str, default="CNN", help="Model type, CNN or ResNet")

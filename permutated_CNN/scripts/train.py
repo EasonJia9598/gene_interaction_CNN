@@ -1,6 +1,8 @@
 
 import time
 from permutated_CNN.model.CNN_structure import *
+from permutated_CNN.model.ResNet_structure import *
+
 import argparse
 ## Pytorch Version
 import pandas as pd 
@@ -16,6 +18,7 @@ import pyfiglet
 from datetime import datetime
 import subprocess
 
+# Show progress bar when loading numpy data
 def np_load_genome_data(file_path):
     blocksize = 1024  # tune this for performance/granularity
     try:
@@ -29,6 +32,7 @@ def np_load_genome_data(file_path):
         del mmap  # make sure file is closed again
     return y
 
+# Function to generate ASCII art using the DOOM font
 def generate_doom_ascii(text):
         try:
             # Create a Figlet font object with the DOOM font style
@@ -43,7 +47,7 @@ def generate_doom_ascii(text):
             return "DOOM font not found. Please make sure you have the DOOM font installed."
         
 
-
+# Function to create a directory
 def create_folders(directory, name):
     try:
         print(f"Create {name} directory")
@@ -79,10 +83,17 @@ def main():
     parser.add_argument('--input_gene_image_size', metavar='N', type=str, help='Three integers for the input gene image size in double quotation mark. Ex: \"1, 100, 600\"')
     parser.add_argument("--gene_image_type", type=int, default=0, help="gene image type, 0 for permutated gene images, 1 for duplicates gene images")
     parser.add_argument("--log_file_name", type=str, default="Permutated_CNN", help="Log file name")
+    parser.add_argument("--model_type", type=str, default="CNN", help="Model type, CNN or ResNet")
+    parser.add_argument("--ResNet_depth", type=int, default=50, help="ResNet depth")
+    parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate for the optimizer")
     args = parser.parse_args()
 
+    model_type = args.model_type
     directory = args.main_dir
     gene_image_type = args.gene_image_type
+    ResNet_depth = args.ResNet_depth
+    learning_rate = args.learning_rate
+
     if gene_image_type == 0:
         gene_data_dir = f"{directory}/gene_images/permutated_gene_images/"
     else:
@@ -133,12 +144,41 @@ def main():
 
     ## Create Permutated CNN model
 
-    # Create the model
-    model = RegressionCNN(input_shape, num_outputs)
+    if model_type == 'CNN':
+        print("LOAD CNN MODEL")
+        # Create the model
+        model = RegressionCNN(input_shape, num_outputs)
+    else:
+        print("LOAD RESNET MODEL")
+        model_parameters={}
+        model_parameters['resnet18'] = ([64,128,256,512],[2,2,2,2],1,False)
+        model_parameters['resnet34'] = ([64,128,256,512],[3,4,6,3],1,False)
+        model_parameters['resnet50'] = ([64,128,256,512],[3,4,6,3],4,True)
+        model_parameters['resnet101'] = ([64,128,256,512],[3,4,23,3],4,True)
+        model_parameters['resnet152'] = ([64,128,256,512],[3,8,36,3],4,True)
+       
+        if ResNet_depth == 18:
+             architecture_setting = model_parameters['resnet18'] 
+        elif ResNet_depth == 34:
+            architecture_setting = model_parameters['resnet34'] 
+        elif ResNet_depth == 50:
+            architecture_setting = model_parameters['resnet50'] 
+        elif ResNet_depth == 101:
+            architecture_setting = model_parameters['resnet101']
+        elif ResNet_depth == 152:
+            architecture_setting = model_parameters['resnet152'] 
+        # Create the model
+        print("architecture_setting:", architecture_setting)
+        model = ResNet(architecture_setting, in_channels=1, num_classes = num_outputs)
+
+
     # Define the loss function and optimizer
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters())
-    # Move model to GPU
+    optimizer = optim.Adam(model.parameters(), lr = learning_rate)
+
+    # Note: PyTorch does not have a direct equivalent to model.summary() in Keras/TensorFlow.
+    # You can print the model to see its architecture.
+    # Move model to GPUs
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -159,14 +199,18 @@ def main():
     # In order to maxiumn the speed of SSD loading, we will load the first batch of data to the SSD
     first_atch_file = f"{temperary_ssd_dr}/{gene_profiles_files[0]}"
 
+
+    process_wait_trigger = False
     if os.path.exists(first_atch_file):
         print("First batch Data File exists")
     else:
         print("Copy First Batch Data to SSD")
+        process_wait_trigger = True
         # Define the terminal command you want to run
         terminal_command = "cp " + gene_data_dir + gene_profiles_files[0] + " " +   temperary_ssd_dr 
         # Execute the terminal command in the background
         process = subprocess.Popen(terminal_command, shell=True)
+
 
 
     validation_test_data_path = temperary_ssd_dr + '/' + gene_profiles_files[-1]
@@ -174,12 +218,13 @@ def main():
     if os.path.exists(validation_test_data_path):
         print("Validation Data File exists")
     else:
+        process_wait_trigger = True
         print("Copy Validation Batch Data to SSD")
         # Define the terminal command you want to run
         terminal_command = "cp " + gene_data_dir + gene_profiles_files[-1] + " " +   temperary_ssd_dr 
         # Execute the terminal command in the background
         process_val = subprocess.Popen(terminal_command, shell=True)
-    print("Please wait for the first batch data to be loaded to the SSD")
+        print("Please wait for the first batch data to be loaded to the SSD")
 
 
     print("Load Validation and Test Data")
@@ -190,8 +235,9 @@ def main():
     X = X[:, None, :, :]
     y = pd.read_csv(rates_data_dir + gene_rates_files[-1]).iloc[:, -num_outputs:].values
 
-    process.wait()
-    process_val.wait()
+    if process_wait_trigger:
+        process.wait()
+        process_val.wait()
 
     print("Success!")
     
@@ -210,14 +256,31 @@ def main():
     val_dataset = RegressionDataset(X_val, y_val)
     val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-    test_dataset = RegressionDataset(X_test, y_test)
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+    # test_dataset = RegressionDataset(X_test, y_test)
+    # test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
     print("Load Success!")
     print(f"X_val.shape: {X_val.shape}")
     print(f"X_test.shape: {X_test.shape}")
     print(f"y_val.shape: {y_val.shape}")
     print(f"y_test.shape: {y_test.shape}")
+
+
+
+    # # Temperoray code for checking
+    # network_type = 'star'
+    # print(network_type.upper())
+    # # X_test = np.load(f'/home/eeepc/Documents/image_genes/test_data/permutated_gene_image_{network_type}.npy')
+    # X_test = np.load(f'/home/eeepc/Documents/image_genes/test_data/{network_type}_profile_image.npy')
+    # X_test = X_test[:, None, :, :]
+    # y_test = pd.read_csv(f'/home/eeepc/Documents/image_genes/test_data/{network_type}_rates_data.csv')
+    # # print(y_test.value_counts())
+    # y_test = y_test.iloc[:, 10:].values
+
+
+
+    # test_dataset = RegressionDataset(X_test, y_test)
+    # test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
 
 
@@ -252,7 +315,7 @@ def main():
                 # Define the terminal command you want to run
                 terminal_command = "rm " + temperary_ssd_dr + '/' + gene_profiles_files[file_id - 1]
                 # Execute the terminal command in the background
-                process = subprocess.Popen(terminal_command, shell=True)
+                rm_process = subprocess.Popen(terminal_command, shell=True)
 
 
             # Define the terminal command you want to run
@@ -357,22 +420,39 @@ def main():
                     # Save the best model
                     # torch.save(batch_best_model.state_dict(), f"{model_dir}/batch_best_model_{np.round(val_loss,3)}.pth")
                     torch.save(batch_best_model.state_dict(), f"{temperary_ssd_dr_model_checkpoints}/batch_best_model_{np.round(val_loss,3)}.pth")
-
                     best_MSE = val_loss
 
                 print(f'Gen {Gen}: Batch {file_id + 1} {epoch+1}/{sub_training_batch}, Loss: {loss.item():.4f}, Val Loss: {val_loss:.4f}')
 
-                if early_stopping < 0:
-                    print("####################################################################")
-                    print("Stop the training by early stopping")
-                    print("####################################################################")
-                    break
+                
+                # prediction_list = []
+                # truth_list = []
+
+                # test_loss = 0
+
+                # with torch.no_grad():
+                #     for test_inputs, test_targets in test_dataloader:
+                #         # Transfer validation data to GPU
+                #         test_inputs = test_inputs.to(device)
+                #         prediction_tf = model.forward(test_inputs)
+                #         test_loss += criterion(prediction_tf.detach().cpu(), test_targets).item()
+                #         predictions = pd.DataFrame(prediction_tf.detach().cpu().numpy())
+                #         prediction_list.append(predictions)
+                #         truth_list.append(pd.DataFrame(test_targets.numpy()))
+                        
+
+                # predictions = pd.concat(prediction_list, axis=0)
+                # truth = pd.concat(truth_list, axis=0)
+                # print(f"STAR test set LOSS {(predictions.values - truth.values).mean()}")
+
 
             # end batch for loop
             batch_val_loss /= sub_training_batch
             whole_run_loss += batch_val_loss
             print("Wait for images copy to finish")
             process.wait()
+            if file_id > 1:
+                rm_process.wait()
             print("Success!")
 
         # end one single training loop
@@ -394,7 +474,12 @@ def main():
             print(f'No improvement at {np.round(whole_run_loss,2)}')
             print("####################################################################")
             early_stopping -= 1
-
+            
+        if early_stopping < 0:
+            print("####################################################################")
+            print("Stop the training by early stopping")
+            print("####################################################################")
+            break
 
 
 # Running 
