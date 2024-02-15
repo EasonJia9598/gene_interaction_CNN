@@ -1,5 +1,5 @@
 python ./permutated_CNN/scripts/train.py \
-    --main_dir /media/eeepc/3866FF5566FF127C/random_tree_data/random_tree_5_genes_2400000_records_2024_02_10_23_29_40  \
+    --main_dir /media/eeepc/3866FF5566FF127C/uniform_datta/uniform_random_tree_5_genes_400000_records_2024_02_12_14_29_06  \
     --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver \
     --epochs 100000 \
     --batch_size 64 \

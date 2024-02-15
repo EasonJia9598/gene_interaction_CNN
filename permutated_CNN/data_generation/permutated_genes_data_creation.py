@@ -67,7 +67,7 @@ def concatenate_duplicates_gene_profiles(files, raw_data_path, _epochs, saving_f
 
 def combine_rates(directory, file_name_pattern, number_of_rates_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
     # Get a list of all files in the directory
-    raw_data_path = f'{directory}/raw_data'
+    raw_data_path = f'{directory}/raw_data/rates'
     saving_folder = f'{directory}/rates'
 
 
@@ -104,7 +104,7 @@ def combine_rates(directory, file_name_pattern, number_of_rates_in_one_gene_imag
 
 def create_permutated_gene_images(directory, profile_file_name_pattern, number_of_profiles_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
     # Specify the directory where your files are located
-    raw_data_path = f'{directory}/raw_data/'
+    raw_data_path = f'{directory}/raw_data/profiles'
     saving_folder = f'{directory}/gene_images/permutated_gene_images'
 
     try:
@@ -147,7 +147,7 @@ def create_permutated_gene_images(directory, profile_file_name_pattern, number_o
 
 def create_duplicates_gene_images(directory, profile_file_name_pattern, number_of_profiles_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
     # Specify the directory where your files are located
-    raw_data_path = f'{directory}/raw_data/'
+    raw_data_path = f'{directory}/raw_data/profiles'
     saving_folder = f'{directory}/gene_images/duplicates_gene_images'
 
     try:
