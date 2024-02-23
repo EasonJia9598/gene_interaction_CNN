@@ -49,9 +49,17 @@ def generate_permutations():
 
 def single_gene_permutation_creation(single_gene, result_permutations):
     one_new_gene_with_all_permutations = []
-    for i in (range(len(result_permutations))):
-        one_new_gene_with_all_permutations.append(single_gene.iloc[:, result_permutations[i]])
-    gene_image_df = pd.concat(one_new_gene_with_all_permutations, axis=1)
+    np_single_gene = single_gene.values
+    # shuffled_permutations = np.random.permutation(result_permutations)
+    # shuffled_permutations = (shuffled_permutations.flatten()[:200]).reshape(40, 5)
+    
+    for permutation in result_permutations:
+        # one_new_gene_with_all_permutations.append(single_gene.iloc[:, result_permutations[i]])
+        # get the permutation array by [each 5]
+        one_new_gene_with_all_permutations.append(np_single_gene[:, permutation])
+    # gene_image_df = pd.concat(one_new_gene_with_all_permutations, axis=1)
+    gene_image_df = np.concatenate(one_new_gene_with_all_permutations, axis=1)
+    # print(gene_image_df.shape)
     return gene_image_df
 
 
@@ -61,7 +69,7 @@ def create_gene_image_dataset_with_permutation(profiles, result_permutations):
     images = []
     for gene_i in tqdm(range(int(profiles.shape[1]/ 5))):
         gene_image = single_gene_permutation_creation(get_single_gene(profiles, gene_i * 5) , result_permutations)
-        images.append(gene_image.values)
+        images.append(gene_image)
     return np.array(images)
 
 

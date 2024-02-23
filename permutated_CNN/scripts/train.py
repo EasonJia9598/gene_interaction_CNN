@@ -114,6 +114,7 @@ def main():
     log_dir = f"{directory}/logs/{formatted_time}_{log_file_name}"
     model_dir = f"{directory}/model_checkpoints/{formatted_time}_{log_file_name}"
     
+    create_folders(temperary_ssd_dr, "temperary_ssd_dr")
     create_folders(f"{directory}/logs", "main log")
     create_folders(f"{directory}/model_checkpoints", "model checkpoints")
 
@@ -174,7 +175,7 @@ def main():
 
     # Define the loss function and optimizer
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr = learning_rate)
+    optimizer = optim.AdamW(model.parameters(), lr = learning_rate)
 
     # Note: PyTorch does not have a direct equivalent to model.summary() in Keras/TensorFlow.
     # You can print the model to see its architecture.
@@ -224,7 +225,14 @@ def main():
         terminal_command = "cp " + gene_data_dir + gene_profiles_files[-1] + " " +   temperary_ssd_dr 
         # Execute the terminal command in the background
         process_val = subprocess.Popen(terminal_command, shell=True)
+        print("####################################################################")
         print("Please wait for the first batch data to be loaded to the SSD")
+        print("####################################################################")
+
+
+    if process_wait_trigger:
+        process.wait()
+        process_val.wait()
 
 
     print("Load Validation and Test Data")
@@ -235,9 +243,7 @@ def main():
     X = X[:, None, :, :]
     y = pd.read_csv(rates_data_dir + gene_rates_files[-1]).iloc[:, -num_outputs:].values
 
-    if process_wait_trigger:
-        process.wait()
-        process_val.wait()
+
 
     print("Success!")
     

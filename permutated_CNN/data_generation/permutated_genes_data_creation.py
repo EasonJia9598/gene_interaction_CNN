@@ -47,15 +47,25 @@ def concatenate_duplicates_gene_profiles(files, raw_data_path, _epochs, saving_f
     file_index = 0 
     for file in files:
         file_path = os.path.join(raw_data_path, file)
-        print(file_path)
+        # print(file_path)
         X_profiles = pd.read_csv(file_path)
+        print("############################################################################")
+        print("File path: ", file_path, " \nFile Shape: ", X_profiles.shape)
+        print("############################################################################")
         gene_image_df = create_gene_image_dataset_duplicates(X_profiles, 40)
+        print("############################################################################")
+        print("File Shape after duplicates: ", gene_image_df.shape)
+        print("############################################################################")
         if file_index == 0:
             previous_gene_image = gene_image_df
         else:
             print("############################################################################")
             print(" CONCATENATING FILES")
+            print("File Shape before: ", previous_gene_image.shape)
+            print("############################################################################")
             previous_gene_image = np.concatenate([previous_gene_image, gene_image_df],  axis = 0 )
+            print("############################################################################")
+            print("File Shape after: ", previous_gene_image.shape)
             print("############################################################################")
 
         progress_bar.update(1)
@@ -128,6 +138,8 @@ def create_permutated_gene_images(directory, profile_file_name_pattern, number_o
 
     # get permutated CNN sequence
     permuations_result =  generate_permutations()
+    shuffled_permutations = np.random.permutation(permuations_result)
+    permuations_result = (shuffled_permutations.flatten()[:200]).reshape(40, 5)
 
     num_batches = number_of_profiles_in_one_gene_image_array
 

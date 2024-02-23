@@ -1,5 +1,5 @@
 python ./permutated_CNN/scripts/generate_data.py \
-    --directory /media/eeepc/3866FF5566FF127C/uniform_datta/uniform_random_tree_5_genes_400000_records_2024_02_12_14_29_06 \
+    --directory /media/eeepc/3866FF5566FF127C/uniform_datta/400_tips_tree_5_genes_4000000_records_2024_02_21_21_40_11 \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 32 \
