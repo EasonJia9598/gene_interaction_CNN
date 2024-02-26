@@ -1,11 +1,13 @@
 python ./permutated_CNN/scripts/train.py \
-    --main_dir /media/eeepc/3866FF5566FF127C/uniform_datta/uniform_random_tree_5_genes_4000000_records_2024_02_15_01_30_28  \
-    --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/pure_uniform_4million \
+    --main_dir /media/eeepc/3866FF5566FF127C/uniform_datta/400_tips_tree_5_genes_2000000_records_2024_02_23_21_20_09  \
+    --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/400_tips \
+    --load_model_checkpoint 1 \
+    --model_checkpoint_path /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/400_tips/model_checkpoints/02_25_21_39_12_random_sampled_pure_uniform_permutated_ResNet_34_1e3/batch_best_model_0.085.pth \
     --epochs 100000 \
-    --batch_size 64 \
+    --batch_size 32 \
     --num_outputs 10 \
-    --sub_training_batch 6 \
-    --input_gene_image_size "1, 100, 200" \
+    --sub_training_batch 8 \
+    --input_gene_image_size "1, 400, 200" \
     --gene_image_type 1 \
     --log_file_name "random_sampled_pure_uniform_permutated_ResNet_34_1e3" \
     --model_type "ResNet" \

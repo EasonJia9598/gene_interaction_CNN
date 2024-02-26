@@ -1,6 +1,7 @@
 library(knitrProgressBar)
 library(parallel)
 library(ape)
+library(evolCCM)
 # install.packages("devtools")
 #library(devtools)
 #devtools::install_github("beiko-lab/evolCCM")
@@ -114,8 +115,8 @@ simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_name
 
 
 for (number_of_gens in start_number_of_genes:end_number_of_genes){
-  n_runs = 40 # number of simulations
-  per_runs = 50000 # number of simulations per run
+  n_runs = 16 # number of simulations
+  per_runs = 100000 # number of simulations per run
   n = number_of_gens # number of genes in community
   # save results
   print(paste("Number of Genes:", n))
@@ -124,7 +125,7 @@ for (number_of_gens in start_number_of_genes:end_number_of_genes){
   timestamp <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
   
   # Specify the path for the new folder
-  folder_path <-sprintf("/scratch/zjia/multiprocess/400_tips_tree_%d_genes_%d_records_%s", n, n_runs * per_runs, timestamp)
+  folder_path <-sprintf("/home/eeepc/Documents/random_tree/code_base/R_code_simulate_data/simulated_data/400_tips_tree_%d_genes_%d_records_%s", n, n_runs * per_runs, timestamp)
   raw_data_path <- paste0(folder_path, '/raw_data')
   rates_path <- paste0(folder_path,'/raw_data/rates')
   profile_path <-paste0(folder_path, '/raw_data/profiles')

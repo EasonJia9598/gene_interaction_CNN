@@ -10,8 +10,8 @@ sim_tree = rtree(n = t_s) # generate a random 100-tip tree
 sim_tree$edge.length = sim_tree$edge.length / mean(sim_tree$edge.length) * 0.1
 
 
-EstimateCCM_updated_version <- function(profiles, phytree, ip=0.1, pen=0.5,  ...){
-  ### Main function for parameter estimation based on `ace()` from `ape` package.
+EstimateCCM_updated_version <- function(profiles, phytree, ip=0.1, pen=0.5,  ...){ # nolint
+  ### Main function for parameter estimation based on `ace()` from `ape` package. # nolint: line_length_linter.
   if (nrow(profiles) != length(phytree$tip.label)){
     stop("the profile matrix size doesn't match the number of tips on the tree.")
   }
@@ -113,15 +113,15 @@ EstimateCCM_updated_version <- function(profiles, phytree, ip=0.1, pen=0.5,  ...
     ip = rep(ip, length.out = np)
   }
   
-  #print('Trigger program nlm')
+  #print('Trigger program nlm') # nolint
   iter.history <- capture.output(
-    out <- nlminb(ip, function(p) dev(p),
+    out <- nlminb(ip, function(p) dev(p), # nolint
                   control = list(...)), split=T)
   
   obj$loglik <- -out$objective/2
   obj$rates <- out$par
   #print('Trigger program nlm 2')
-  out.nlm <- try(nlm(function(p) dev(p), p = obj$rates, iterlim = 1, stepmax = 0, hessian = TRUE), silent = TRUE)
+  out.nlm <- try(nlm(function(p) dev(p), p = obj$rates, iterlim = 1, stepmax = 0, hessian = TRUE), silent = TRUE) # nolint
   #print('Trigger program') 
   Cestimate = matrix(0, nrow=n, ncol=n)
   Cestimate[upper.tri(Cestimate,diag=F)] = obj$rates[(2*n+1):length(obj$rates)]
@@ -185,11 +185,11 @@ full_connected = c(1,	1,	1,	1,	1,	1,	1,	1,	1,	1) * network_type_rates
 types_name = c("line", "two_triangles", "star", "full_connected")
 b12_matrix_data <- cbind(line, two_triangles, star, full_connected)
 
-folder_saving_name = '100_new_version/'
-
+folder_saving_name = '100_new_version/' # nolint
+dir.create(paste0("./prediction/", folder_saving_name))
 print("Start to create folders")
 for (type_index in 1:4){
-  saving_folder_path = paste0("/scratch/zjia/data/test_data/prediction/", folder_saving_name, types_name[type_index])
+  saving_folder_path = paste0("./prediction/", folder_saving_name, types_name[type_index]) # nolint
   dir.create(saving_folder_path)
   
 }
@@ -244,7 +244,7 @@ for (type_index in 1:4){
   #print(head(profiles))
   
 
-  saving_folder_path = paste0("/scratch/zjia/data/test_data/prediction/",folder_saving_name, types_name[type_index])
+  saving_folder_path = paste0("/scratch/zjia/data/test_data/prediction/",folder_saving_name, types_name[type_index]) # nolint
   write.csv(rates, paste0(saving_folder_path, "/rates_data.csv"), quote=F, row.names=F)
   write.csv(profiles,  paste0(saving_folder_path, "/profiles_data.csv"), quote=F, row.names=F)
   write.csv(estP,  paste0(saving_folder_path, "/estP.csv") , quote=F, row.names=F)

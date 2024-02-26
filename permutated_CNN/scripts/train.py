@@ -76,6 +76,8 @@ def main():
     parser = argparse.ArgumentParser(description="Train a CNN model for regression")
     parser.add_argument("--main_dir", type=str, help="Directory containing the required files")
     parser.add_argument("--temperary_ssd_dr", type=str, help="Directory saving the loading file")
+    parser.add_argument("--load_model_checkpoint", type=int, help="If Load the model checkpoint, 0 for without loading, 1 for loading the model checkpoint")
+    parser.add_argument("--model_checkpoint_path", type=str, help="Model checkpoint path")
     parser.add_argument("--epochs", type=int, default=100, help="Number of epochs for training")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
     parser.add_argument("--num_outputs", type=int, default=10, help="Number of outputs for the regression model")
@@ -93,6 +95,8 @@ def main():
     gene_image_type = args.gene_image_type
     ResNet_depth = args.ResNet_depth
     learning_rate = args.learning_rate
+    load_model_checkpoint = args.load_model_checkpoint
+    model_checkpoint_path = args.model_checkpoint_path
 
     if gene_image_type == 0:
         gene_data_dir = f"{directory}/gene_images/permutated_gene_images/"
@@ -145,6 +149,7 @@ def main():
 
     ## Create Permutated CNN model
 
+    
     if model_type == 'CNN':
         print("LOAD CNN MODEL")
         # Create the model
@@ -171,6 +176,17 @@ def main():
         # Create the model
         print("architecture_setting:", architecture_setting)
         model = ResNet(architecture_setting, in_channels=1, num_classes = num_outputs)
+
+    if load_model_checkpoint:
+        # Load the state dictionary from the checkpoint file
+        checkpoint = torch.load(model_checkpoint_path)
+        # Load the state dictionary into your model
+        model.load_state_dict(checkpoint)
+        print("####################################################################")
+        print(generate_doom_ascii(f"Model  checkpoint Load  Success!"))
+        print("--------------------------------------------------------------------")
+        print(f"Load model checkpoint from {model_checkpoint_path}")
+        print("####################################################################")
 
 
     # Define the loss function and optimizer

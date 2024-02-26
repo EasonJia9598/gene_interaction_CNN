@@ -1,9 +1,9 @@
 python ./permutated_CNN/scripts/generate_data.py \
-    --directory /media/eeepc/3866FF5566FF127C/uniform_datta/400_tips_tree_5_genes_4000000_records_2024_02_21_21_40_11 \
+    --directory /media/eeepc/3866FF5566FF127C/uniform_datta/400_tips_tree_5_genes_2000000_records_2024_02_23_21_20_09 \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
-    --number_of_profiles_in_one_gene_image_array 32 \
-    --generation_type 2 \
+    --number_of_profiles_in_one_gene_image_array 20 \
+    --generation_type 1 \
     --cut_off_files 0 \
     --total_files_to_convert 32 \
     --gene_image_type 1
