@@ -1,5 +1,5 @@
 batch_training.log
 /test_data/*
 temperary_data_saver/*
-R_code_simulate_data/prediction
-R_code_simulate_data/simulated_data
+R_code_simulate_data/prediction/*
+R_code_simulate_data/simulated_data/*

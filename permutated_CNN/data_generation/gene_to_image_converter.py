@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from itertools import permutations
 
 def draw_gene(gene):
     # Set the figure size
@@ -36,7 +37,7 @@ def get_single_gene_duplicates(X_profiles, index, duplicates_number):
     # Reshape the array to concatenate along axis 1
     return  result_df
 
-from itertools import permutations
+
 
 def generate_permutations():
     elements = [0, 1, 2, 3, 4]
@@ -50,8 +51,7 @@ def generate_permutations():
 def single_gene_permutation_creation(single_gene, result_permutations):
     one_new_gene_with_all_permutations = []
     np_single_gene = single_gene.values
-    # shuffled_permutations = np.random.permutation(result_permutations)
-    # shuffled_permutations = (shuffled_permutations.flatten()[:200]).reshape(40, 5)
+
     
     for permutation in result_permutations:
         # one_new_gene_with_all_permutations.append(single_gene.iloc[:, result_permutations[i]])
