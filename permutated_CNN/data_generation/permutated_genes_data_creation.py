@@ -1,16 +1,39 @@
 from permutated_CNN.data_generation.gene_to_image_converter import *
-
+from tqdm import tqdm
+import time
 
 # Function to extract the numeric part of the filename
 def extract_numeric_part(filename):
     return int(''.join(filter(str.isdigit, filename)))
+
+
+
+def read_csv_with_chunksize(file_path, chunksize = 100):
+    # Get the total number of lines in the file
+    num_lines = sum(1 for _ in open(file_path))
+
+    # Create an empty list to store the chunks
+    chunks = []
+
+    # Create a progress bar
+    with tqdm(total=num_lines) as pbar:
+        # Read the CSV file in chunks and iterate over each chunk
+        for chunk in pd.read_csv(file_path, chunksize=chunksize, low_memory=False):
+            # Append the processed chunk to the list
+            chunks.append(chunk)
+            pbar.update(len(chunk))
+
+    # Concatenate the list of chunks into a single DataFrame
+    df = pd.concat(chunks, ignore_index=True)
+
+    return df
 
 def concatenate_gene_rates(files, raw_data_path, _epochs, saving_folder):
     index = 1
     dataframes = []
     for file in files:
         file_path = os.path.join(raw_data_path, file)
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path , low_memory=False)
         print(file_path)
         dataframes.append(df)
         print(f"finish file {index}")
@@ -42,17 +65,17 @@ def concatenate_permutated_gene_profiles(files, raw_data_path, _epochs, permuati
     np.save(f'{saving_folder}/{_epochs}_random_tree_permutated_gene_image.npy', previous_gene_image)
 
 
-def concatenate_duplicates_gene_profiles(files, raw_data_path, _epochs, saving_folder):
+def concatenate_duplicates_gene_profiles(number_of_genes, files, raw_data_path, _epochs, saving_folder):
     progress_bar = tqdm(total=len(files), desc='Generating Files')
     file_index = 0 
     for file in files:
         file_path = os.path.join(raw_data_path, file)
         # print(file_path)
-        X_profiles = pd.read_csv(file_path)
+        X_profiles = pd.read_csv(file_path, low_memory=False)
         print("############################################################################")
         print("File path: ", file_path, " \nFile Shape: ", X_profiles.shape)
         print("############################################################################")
-        gene_image_df = create_gene_image_dataset_duplicates(X_profiles, 40)
+        gene_image_df = create_gene_image_dataset_duplicates(number_of_genes, X_profiles, int(200 / number_of_genes))
         print("############################################################################")
         print("File Shape after duplicates: ", gene_image_df.shape)
         print("############################################################################")
@@ -157,7 +180,7 @@ def create_permutated_gene_images(directory, profile_file_name_pattern, number_o
 
 
 
-def create_duplicates_gene_images(directory, profile_file_name_pattern, number_of_profiles_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
+def create_duplicates_gene_images(number_of_genes, directory, profile_file_name_pattern, number_of_profiles_in_one_gene_image_array = 6, cut_off_files = False, total_files_to_convert = 32):
     # Specify the directory where your files are located
     raw_data_path = f'{directory}/raw_data/profiles'
     saving_folder = f'{directory}/gene_images/duplicates_gene_images'
@@ -187,17 +210,17 @@ def create_duplicates_gene_images(directory, profile_file_name_pattern, number_o
 
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
-        concatenate_duplicates_gene_profiles(sub_files, raw_data_path, _epochs, saving_folder)
+        concatenate_duplicates_gene_profiles(number_of_genes, sub_files, raw_data_path, _epochs, saving_folder)
 
     # In case there are more files than the number of gene arrays
     if len(files) > number_of_gene_arrays * num_batches:
         sub_files = files[number_of_gene_arrays * num_batches:]
-        concatenate_duplicates_gene_profiles(sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
+        concatenate_duplicates_gene_profiles(number_of_genes, sub_files, raw_data_path, number_of_gene_arrays, saving_folder)
 
 
 
 
-def data_generation(directory, profile_file_name_pattern, rates_file_name_pattern, number_of_files_in_one_gene_image_array = 6, generation_type = 0, cut_off_files = False, total_files_to_convert = 32, gene_image_type = 0):
+def data_generation(number_of_genes, directory, profile_file_name_pattern, rates_file_name_pattern, number_of_files_in_one_gene_image_array = 6, generation_type = 0, cut_off_files = False, total_files_to_convert = 32, gene_image_type = 0):
     '''
         profile_file_name_pattern: str
         rates_file_name_pattern: str
@@ -234,7 +257,7 @@ def data_generation(directory, profile_file_name_pattern, rates_file_name_patter
             print("############################################################################")
             print("DUPLICATES GENE IMAGES")
             print("############################################################################")
-            create_duplicates_gene_images(directory, profile_file_name_pattern, number_of_files_in_one_gene_image_array, cut_off_files, total_files_to_convert)
+            create_duplicates_gene_images(number_of_genes, directory, profile_file_name_pattern, number_of_files_in_one_gene_image_array, cut_off_files, total_files_to_convert)
 
     print("############################################################################")
     print("Data Generation Completed")

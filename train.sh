@@ -1,24 +1,21 @@
 python ./permutated_CNN/scripts/train.py \
-    --main_dir /media/eeepc/3866FF5566FF127C/uniform_datta/400_tips_tree_5_genes_2000000_records_2024_02_23_21_20_09  \
-    --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/400_tips \
-    --load_model_checkpoint 1 \
-    --model_checkpoint_path /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/400_tips/model_checkpoints/02_25_21_39_12_random_sampled_pure_uniform_permutated_ResNet_34_1e3/batch_best_model_0.085.pth \
+    --main_dir /media/eeepc/3866FF5566FF127C/400_genes/400_tips_tree_100_genes_400000_records_2024_03_01_12_46_07  \
+    --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/100_genes \
+    --load_model_checkpoint 0 \
+    --model_checkpoint_path none\
     --epochs 100000 \
-    --batch_size 32 \
-    --num_outputs 10 \
-    --sub_training_batch 8 \
+    --batch_size 16 \
+    --num_outputs 4950 \
+    --sub_training_batch 10\
     --input_gene_image_size "1, 400, 200" \
     --gene_image_type 1 \
-    --log_file_name "random_sampled_pure_uniform_permutated_ResNet_34_1e3" \
+    --log_file_name "100_genes_ResNet50_2e-5" \
     --model_type "ResNet" \
-    --ResNet_depth 50 \
-    --learning_rate 2e-4 \
+    --ResNet_depth 34 \
+    --learning_rate 1e-4 \
 
 
 # gene_image_type 1 for duplicates images, 0 for permutated images
-
-
-
 # python ./permutated_CNN/scripts/train.py \
 #     --main_dir /home/eeepc/Documents/random_tree/random_tree_5_genes_2024_02_10_13_38_30_n_records_200000 \
 #     --epochs 100000 \
@@ -36,7 +33,7 @@ python ./permutated_CNN/scripts/train.py \
     # parser.add_argument("--epochs", type=int, default=100, help="Number of epochs for training")
     # parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
     # parser.add_argument("--num_outputs", type=int, default=10, help="Number of outputs for the regression model")
-    # parser.add_argument("--sub_training_batch", type=int, default=10, help="Number of sub-training batches")
+    # parser.add_argument("--sub_training_batch", type=int, default=10, help="Number of sub-training epochs for 1 batch")
     # parser.add_argument('--input_gene_image_size', metavar='N', type=str, nargs=3, help='Three integers for the input gene image size. Ex: \'(1, 100, 600)\'')
     # parser.add_argument("--gene_image_type", type=int, default=0, help="gene image type, 0 for permutated gene images, 1 for duplicates gene images")
     #  parser.add_argument("--model_type", type=str, default="CNN", help="Model type, CNN or ResNet")

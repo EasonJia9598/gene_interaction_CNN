@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import permutations
+import pdb
+
+
 
 def draw_gene(gene):
     # Set the figure size
@@ -17,11 +20,11 @@ def draw_gene(gene):
     plt.show()
 
     
-def get_single_gene(profiles, index):
-    return profiles.iloc[:, index:index+5]
+def get_single_gene(number_of_genes, profiles, index):
+    return profiles.iloc[:, index:index+number_of_genes]
 
-def get_single_gene_duplicates(X_profiles, index, duplicates_number):
-    original_df = get_single_gene(X_profiles, index)
+def get_single_gene_duplicates(number_of_genes, X_profiles, index, duplicates_number):
+    original_df = get_single_gene(number_of_genes, X_profiles, index)
     # Create 40 copies of the original DataFrame
     copies = [original_df.copy() for _ in range(duplicates_number)]
 
@@ -65,24 +68,27 @@ def single_gene_permutation_creation(single_gene, result_permutations):
 
 
 
-def create_gene_image_dataset_with_permutation(profiles, result_permutations):
+def create_gene_image_dataset_with_permutation(number_of_genes, profiles, result_permutations):
     images = []
-    for gene_i in tqdm(range(int(profiles.shape[1]/ 5))):
-        gene_image = single_gene_permutation_creation(get_single_gene(profiles, gene_i * 5) , result_permutations)
+    for gene_i in tqdm(range(int(profiles.shape[1]/ number_of_genes))):
+        gene_image = single_gene_permutation_creation(get_single_gene(number_of_genes, profiles, gene_i * number_of_genes) , result_permutations)
         images.append(gene_image)
     return np.array(images)
 
 
-def create_gene_image_dataset_duplicates(profiles, duplicates_number):
+def create_gene_image_dataset_duplicates(number_of_genes, profiles, duplicates_number):
     images = []
-    for gene_i in tqdm(range(int(profiles.shape[1]/ 5))):
-        gene_image = get_single_gene_duplicates(profiles, gene_i * 5, duplicates_number)
+    for gene_i in tqdm(range(int(profiles.shape[1]/ number_of_genes))):
+        gene_image = get_single_gene_duplicates(number_of_genes, profiles, gene_i * number_of_genes, duplicates_number)
         images.append(gene_image)
+    
+    print('Gene shape', np.array(images).shape)
+    # pdb.set_trace()
     return np.array(images)
 
-def create_gene_image_dataset_single_gene(profiles):
+def create_gene_image_dataset_single_gene(number_of_genes, profiles):
     images = []
-    for gene_i in tqdm(range(int(profiles.shape[1]/ 5))):
-        gene_image = get_single_gene(profiles, gene_i * 5)
+    for gene_i in tqdm(range(int(profiles.shape[1]/ number_of_genes))):
+        gene_image = get_single_gene(profiles, gene_i * number_of_genes)
         images.append(gene_image)
     return np.array(images)

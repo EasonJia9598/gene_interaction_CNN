@@ -71,6 +71,29 @@ def get_files_list(data_dir, file_extension=".npy"):
     files.sort(key=extract_numeric_part)
     return files
 
+
+def read_csv_with_chunksize(file_path, chunksize = 100):
+    # Get the total number of lines in the file
+    print("Read CSV file...")
+    num_lines = sum(1 for _ in open(file_path))
+
+    # Create an empty list to store the chunks
+    chunks = []
+
+    # Create a progress bar
+    with tqdm(total=num_lines) as pbar:
+        # Read the CSV file in chunks and iterate over each chunk
+        for chunk in pd.read_csv(file_path, chunksize=chunksize, low_memory=False):
+            # Append the processed chunk to the list
+            chunks.append(chunk)
+            pbar.update(len(chunk))
+
+    # Concatenate the list of chunks into a single DataFrame
+    df = pd.concat(chunks, ignore_index=True)
+
+    return df
+
+
 def main():
     # Get arguments 
     parser = argparse.ArgumentParser(description="Train a CNN model for regression")
@@ -257,7 +280,9 @@ def main():
     X = np_load_genome_data(temperary_ssd_dr + '/' + gene_profiles_files[-1])
     
     X = X[:, None, :, :]
-    y = pd.read_csv(rates_data_dir + gene_rates_files[-1]).iloc[:, -num_outputs:].values
+
+    y = read_csv_with_chunksize(rates_data_dir + gene_rates_files[-1])
+    y = y.iloc[:, -num_outputs:].values
 
 
 
@@ -356,7 +381,7 @@ def main():
                     condition_to_move_on = False
 
             print(gene_profiles_files[file_id])
-            rates = pd.read_csv(rates_data_dir + gene_rates_files[file_id])
+            rates = read_csv_with_chunksize(rates_data_dir + gene_rates_files[file_id])
             rates = rates.iloc[:, -num_outputs:]
             print(gene_rates_files[file_id])
 
