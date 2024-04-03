@@ -18,19 +18,36 @@ import pyfiglet
 from datetime import datetime
 import subprocess
 
-# Show progress bar when loading numpy data
-def np_load_genome_data(file_path):
-    blocksize = 1024  # tune this for performance/granularity
+# # Show progress bar when loading numpy data
+# def np_load_genome_data(file_path):
+#     blocksize = 5000  # tune this for performance/granularity
+#     try:
+#         mmap = np.load(file_path, mmap_mode='r')
+#         y = np.empty_like(mmap)
+#         n_blocks = int(np.ceil(mmap.shape[0] / blocksize))
+#         for b in tqdm(range(n_blocks)):
+#             # print('progress: {}/{}'.format(b, n_blocks))  # use any progress indicator
+#             y[b*blocksize : (b+1) * blocksize] = mmap[b*blocksize : (b+1) * blocksize]
+#     finally:
+#         del mmap  # make sure file is closed again
+#     return y
+
+def np_load_genome_data(file_path, chunks=None):
+    blocksize = 1000  # tune this for performance/granularity
     try:
         mmap = np.load(file_path, mmap_mode='r')
         y = np.empty_like(mmap)
         n_blocks = int(np.ceil(mmap.shape[0] / blocksize))
-        for b in tqdm(range(n_blocks)):
-            # print('progress: {}/{}'.format(b, n_blocks))  # use any progress indicator
+        if chunks is None:
+            chunks = n_blocks
+        else:
+            chunks = min(chunks, n_blocks)
+        for b in tqdm(range(chunks)):
             y[b*blocksize : (b+1) * blocksize] = mmap[b*blocksize : (b+1) * blocksize]
     finally:
         del mmap  # make sure file is closed again
     return y
+
 
 # Function to generate ASCII art using the DOOM font
 def generate_doom_ascii(text):
@@ -72,7 +89,7 @@ def get_files_list(data_dir, file_extension=".npy"):
     return files
 
 
-def read_csv_with_chunksize(file_path, chunksize = 100):
+def read_csv_with_chunksize(file_path, chunksize = 8000):
     # Get the total number of lines in the file
     print("Read CSV file...")
     num_lines = sum(1 for _ in open(file_path))
@@ -98,6 +115,7 @@ def main():
     # Get arguments 
     parser = argparse.ArgumentParser(description="Train a CNN model for regression")
     parser.add_argument("--main_dir", type=str, help="Directory containing the required files")
+    parser.add_argument("--if_use_temperary_ssd", type=int, help="If use temperary SSD, 0 for without using, 1 for using")
     parser.add_argument("--temperary_ssd_dr", type=str, help="Directory saving the loading file")
     parser.add_argument("--load_model_checkpoint", type=int, help="If Load the model checkpoint, 0 for without loading, 1 for loading the model checkpoint")
     parser.add_argument("--model_checkpoint_path", type=str, help="Model checkpoint path")
@@ -111,6 +129,7 @@ def main():
     parser.add_argument("--model_type", type=str, default="CNN", help="Model type, CNN or ResNet")
     parser.add_argument("--ResNet_depth", type=int, default=50, help="ResNet depth")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate for the optimizer")
+    parser.add_argument("--training_data_size", type=int, default=40000, help="Training data size")
     args = parser.parse_args()
 
     model_type = args.model_type
@@ -120,6 +139,11 @@ def main():
     learning_rate = args.learning_rate
     load_model_checkpoint = args.load_model_checkpoint
     model_checkpoint_path = args.model_checkpoint_path
+    if_use_temperary_ssd = int(args.if_use_temperary_ssd)
+
+
+
+
 
     if gene_image_type == 0:
         gene_data_dir = f"{directory}/gene_images/permutated_gene_images/"
@@ -141,16 +165,20 @@ def main():
     log_dir = f"{directory}/logs/{formatted_time}_{log_file_name}"
     model_dir = f"{directory}/model_checkpoints/{formatted_time}_{log_file_name}"
     
-    create_folders(temperary_ssd_dr, "temperary_ssd_dr")
+    if if_use_temperary_ssd == 1:
+        create_folders(temperary_ssd_dr, "temperary_ssd_dr")
+
     create_folders(f"{directory}/logs", "main log")
     create_folders(f"{directory}/model_checkpoints", "model checkpoints")
 
     create_folders(log_dir, "current log")
     create_folders(model_dir, "current model")
 
-    temperary_ssd_dr_model_checkpoints = f"{temperary_ssd_dr}/model_checkpoints/{formatted_time}_{log_file_name}"
-    create_folders(f"{temperary_ssd_dr}/model_checkpoints/", 'temperary_ssd_dr_main_model_checkpoints')
-    create_folders(temperary_ssd_dr_model_checkpoints, 'temperary_ssd_dr_model_checkpoints')
+
+    if if_use_temperary_ssd == 1:
+        temperary_ssd_dr_model_checkpoints = f"{temperary_ssd_dr}/model_checkpoints/{formatted_time}_{log_file_name}"
+        create_folders(f"{temperary_ssd_dr}/model_checkpoints/", 'temperary_ssd_dr_main_model_checkpoints')
+        create_folders(temperary_ssd_dr_model_checkpoints, 'temperary_ssd_dr_model_checkpoints')
     
     num_outputs = args.num_outputs
 
@@ -214,13 +242,26 @@ def main():
 
     # Define the loss function and optimizer
     criterion = nn.MSELoss()
+
+    # optimizer = optim.SGD(model.parameters(), lr = learning_rate)
     optimizer = optim.AdamW(model.parameters(), lr = learning_rate)
+    # optimizer = optim.Adam(model.parameters(), lr = learning_rate)
+
 
     # Note: PyTorch does not have a direct equivalent to model.summary() in Keras/TensorFlow.
     # You can print the model to see its architecture.
     # Move model to GPUs
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    print("####################################################################")
+    print(f"Model is using {device} for training")
+    print("####################################################################")
+    
     model.to(device)
+
+    print(model)
+
+    print(optimizer)
 
     # save for the best agent
     best_MSE = 100000
@@ -236,61 +277,61 @@ def main():
 
     _summ_writer = SummaryWriter(log_trending, flush_secs=1, max_queue=1)
 
-    # In order to maxiumn the speed of SSD loading, we will load the first batch of data to the SSD
-    first_atch_file = f"{temperary_ssd_dr}/{gene_profiles_files[0]}"
+    print("Genes file: ", gene_profiles_files[-1])
 
 
-    process_wait_trigger = False
-    if os.path.exists(first_atch_file):
-        print("First batch Data File exists")
+    if if_use_temperary_ssd == 1:
+        # In order to maxiumn the speed of SSD loading, we will load the first batch of data to the SSD
+        first_atch_file = f"{temperary_ssd_dr}/{gene_profiles_files[0]}"
+        process_wait_trigger = False
+        if os.path.exists(first_atch_file):
+            print("First batch Data File exists")
+        else:
+            print("Copy First Batch Data to SSD")
+            process_wait_trigger = True
+            # Define the terminal command you want to run
+            terminal_command = "cp " + gene_data_dir + gene_profiles_files[0] + " " +   temperary_ssd_dr 
+            # Execute the terminal command in the background
+            process = subprocess.Popen(terminal_command, shell=True)
+
+        validation_test_data_path = temperary_ssd_dr + '/' + gene_profiles_files[-1]
+
+        if os.path.exists(validation_test_data_path):
+            print("Validation Data File exists")
+        else:
+            process_wait_trigger = True
+            print("Copy Validation Batch Data to SSD")
+            # Define the terminal command you want to run
+            terminal_command = "cp " + gene_data_dir + gene_profiles_files[-1] + " " +   temperary_ssd_dr 
+            # Execute the terminal command in the background
+            process_val = subprocess.Popen(terminal_command, shell=True)
+            print("####################################################################")
+            print("Please wait for the first batch data to be loaded to the SSD")
+            print("####################################################################")
+
+        if process_wait_trigger:
+            process.wait()
+            process_val.wait()
+
+
+        print("Load Validation and Test Data")
+        # use the last piece of data for validation, and testing
+        # X = np_load_genome_data(gene_data_dir + gene_profiles_files[-1])
+        X = np_load_genome_data(temperary_ssd_dr + '/' + gene_profiles_files[-1])
     else:
-        print("Copy First Batch Data to SSD")
-        process_wait_trigger = True
-        # Define the terminal command you want to run
-        terminal_command = "cp " + gene_data_dir + gene_profiles_files[0] + " " +   temperary_ssd_dr 
-        # Execute the terminal command in the background
-        process = subprocess.Popen(terminal_command, shell=True)
+        X = np_load_genome_data(gene_data_dir + gene_profiles_files[-1], 12)
 
-
-
-    validation_test_data_path = temperary_ssd_dr + '/' + gene_profiles_files[-1]
-
-    if os.path.exists(validation_test_data_path):
-        print("Validation Data File exists")
-    else:
-        process_wait_trigger = True
-        print("Copy Validation Batch Data to SSD")
-        # Define the terminal command you want to run
-        terminal_command = "cp " + gene_data_dir + gene_profiles_files[-1] + " " +   temperary_ssd_dr 
-        # Execute the terminal command in the background
-        process_val = subprocess.Popen(terminal_command, shell=True)
-        print("####################################################################")
-        print("Please wait for the first batch data to be loaded to the SSD")
-        print("####################################################################")
-
-
-    if process_wait_trigger:
-        process.wait()
-        process_val.wait()
-
-
-    print("Load Validation and Test Data")
-    # use the last piece of data for validation, and testing
-    # X = np_load_genome_data(gene_data_dir + gene_profiles_files[-1])
-    X = np_load_genome_data(temperary_ssd_dr + '/' + gene_profiles_files[-1])
-    
     X = X[:, None, :, :]
-
+    print("X.shape:", X.shape)
+    print("Rates file: ", gene_rates_files[-1])
     y = read_csv_with_chunksize(rates_data_dir + gene_rates_files[-1])
     y = y.iloc[:, -num_outputs:].values
-
-
-
+    print("y.shape:", y.shape)
     print("Success!")
     
     # only take 6000 samples for validation and testing
-    X = X[:6000]
-    y = y[:6000]
+    X = X[:10000]
+    y = y[:10000]
 
     X_val, X_test, y_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -303,6 +344,8 @@ def main():
     val_dataset = RegressionDataset(X_val, y_val)
     val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
+    del val_dataset
+
     # test_dataset = RegressionDataset(X_test, y_test)
     # test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
@@ -312,7 +355,7 @@ def main():
     print(f"y_val.shape: {y_val.shape}")
     print(f"y_test.shape: {y_test.shape}")
 
-
+    del X_val, y_val, X_test, y_test
 
     # # Temperoray code for checking
     # network_type = 'star'
@@ -357,42 +400,51 @@ def main():
             print("Load Batch Data")
             # gene_image_df = np.load(gene_data_dir + gene_profiles_files[file_id])
 
-            
-            if file_id > 1:
+            if if_use_temperary_ssd == 1:
+                if file_id > 1:
+                    # Define the terminal command you want to run
+                    terminal_command = "rm " + temperary_ssd_dr + '/' + gene_profiles_files[file_id - 1]
+                    # Execute the terminal command in the background
+                    rm_process = subprocess.Popen(terminal_command, shell=True)
+
+
                 # Define the terminal command you want to run
-                terminal_command = "rm " + temperary_ssd_dr + '/' + gene_profiles_files[file_id - 1]
+                # Preload the data file to SSD
+                terminal_command = "cp " + gene_data_dir + gene_profiles_files[(file_id + 1) % (len(gene_profiles_files) - 1)] + " " +   temperary_ssd_dr 
                 # Execute the terminal command in the background
-                rm_process = subprocess.Popen(terminal_command, shell=True)
+                process = subprocess.Popen(terminal_command, shell=True)
 
 
-            # Define the terminal command you want to run
-            # Preload the data file to SSD
-            terminal_command = "cp " + gene_data_dir + gene_profiles_files[(file_id + 1) % (len(gene_profiles_files) - 1)] + " " +   temperary_ssd_dr 
-            # Execute the terminal command in the background
-            process = subprocess.Popen(terminal_command, shell=True)
+                condition_to_move_on = True
 
+                while condition_to_move_on:
+                    try:
+                        gene_image_df = np_load_genome_data(temperary_ssd_dr + '/' + gene_profiles_files[file_id])
+                    finally:
+                        condition_to_move_on = False
 
-            condition_to_move_on = True
+            else:
+                gene_image_df = np_load_genome_data(gene_data_dir + gene_profiles_files[file_id], int(args.training_data_size / 1000))
 
-            while condition_to_move_on:
-                try:
-                    gene_image_df = np_load_genome_data(temperary_ssd_dr + '/' + gene_profiles_files[file_id])
-                finally:
-                    condition_to_move_on = False
 
             print(gene_profiles_files[file_id])
             rates = read_csv_with_chunksize(rates_data_dir + gene_rates_files[file_id])
             rates = rates.iloc[:, -num_outputs:]
             print(gene_rates_files[file_id])
 
-            print('rates.shape:', rates.shape)
-            print('gene_image_df.shape:', gene_image_df.shape)
 
             # table_columns = rates.columns
 
-            X_train = gene_image_df[:, None, :, :] 
-            y_train = rates.values
+            X_train = gene_image_df[:args.training_data_size, None, :, :] 
+            y_train = rates[:args.training_data_size].values
+            
+            print('rates.shape:', y_train.shape)
+            print('gene_image_df.shape:', X_train.shape)
 
+            # Free memory space
+            del gene_image_df
+            del rates
+            
             # Split the dataset into training and validation sets (80% training, 20% validation)
             # X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
@@ -401,14 +453,15 @@ def main():
             # Create the RegressionDataset instances for training and validation
             train_dataset = RegressionDataset(X_train, y_train)
 
+            del X_train, y_train
+
             # Create the DataLoader for training and validation
             train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
             # Training the model
             batch_val_loss = 0.0
 
-            # Free memory space
-            del gene_image_df
+            del train_dataset
 
             for epoch in range(sub_training_batch):
                 # For tensorboard logger
@@ -438,13 +491,19 @@ def main():
                 # Validation
                 model.eval()
                 val_loss = 0.0
+                num_batches = len(val_dataloader)
+                progress_bar = tqdm(total=num_batches, desc='Validation')
+
                 with torch.no_grad():
                     for val_inputs, val_targets in val_dataloader:
                         # Transfer validation data to GPU
                         val_inputs, val_targets = val_inputs.to(device), val_targets.to(device)
                         val_outputs = model(val_inputs)
                         val_saving = pd.DataFrame((val_outputs.cpu().numpy()))
-                        val_loss += criterion(val_outputs, val_targets).item()
+                        val_loss_criterion = criterion(val_outputs, val_targets)
+                        val_loss += val_loss_criterion.item()
+                        progress_bar.update(1)
+                        progress_bar.set_postfix(loss=val_loss_criterion.item())
                         
                 # Average validation loss
                 val_loss /= len(val_dataloader)
@@ -460,13 +519,16 @@ def main():
                 }, runs_tracking)
 
                 if val_loss <= best_MSE:
-                    print("####################################################################")
+                    print("\n####################################################################")
                     print(f'Find new batch best model at {val_loss}')
                     print("####################################################################")
                     batch_best_model = copy.deepcopy(model)
                     # Save the best model
                     # torch.save(batch_best_model.state_dict(), f"{model_dir}/batch_best_model_{np.round(val_loss,3)}.pth")
-                    torch.save(batch_best_model.state_dict(), f"{temperary_ssd_dr_model_checkpoints}/batch_best_model_{np.round(val_loss,3)}.pth")
+                    if if_use_temperary_ssd == 1:
+                        torch.save(batch_best_model.state_dict(), f"{temperary_ssd_dr_model_checkpoints}/batch_best_model_{np.round(val_loss,3)}.pth")
+                    else:
+                        torch.save(batch_best_model.state_dict(), f"{model_dir}/batch_best_model_{np.round(val_loss,3)}.pth")
                     best_MSE = val_loss
 
                 print(f'Gen {Gen}: Batch {file_id + 1} {epoch+1}/{sub_training_batch}, Loss: {loss.item():.4f}, Val Loss: {val_loss:.4f}')
@@ -497,13 +559,18 @@ def main():
             batch_val_loss /= sub_training_batch
             whole_run_loss += batch_val_loss
             print("Wait for images copy to finish")
-            process.wait()
-            if file_id > 1:
-                rm_process.wait()
-            print("Success!")
+
+            if if_use_temperary_ssd == 1:
+                process.wait()
+                if file_id > 1:
+                    rm_process.wait()
+                print("Success!")
 
         # end one single training loop
         whole_run_loss /= (len(gene_profiles_files) - 1)
+
+        del train_dataloader
+
 
         if whole_run_loss <= Early_stopping_MSE:
             print("####################################################################")
@@ -513,7 +580,10 @@ def main():
             best_model = copy.deepcopy(model)
             # Save the best model
             # torch.save(best_model.state_dict(), f"{model_dir}/whole_run_best_model_MSE_{np.round(whole_run_loss,2)}.pth")
-            torch.save(best_model.state_dict(), f"{temperary_ssd_dr_model_checkpoints}/whole_run_best_model_MSE_{np.round(whole_run_loss,2)}.pth")
+            if if_use_temperary_ssd == 1:
+                torch.save(best_model.state_dict(), f"{temperary_ssd_dr_model_checkpoints}/whole_run_best_model_MSE_{np.round(whole_run_loss,2)}.pth")
+            else:
+                torch.save(best_model.state_dict(), f"{model_dir}/whole_run_best_model_MSE_{np.round(whole_run_loss,2)}.pth")
 
             Early_stopping_MSE = whole_run_loss
         else:

@@ -76,13 +76,18 @@ def create_gene_image_dataset_with_permutation(number_of_genes, profiles, result
     return np.array(images)
 
 
-def create_gene_image_dataset_duplicates(number_of_genes, profiles, duplicates_number):
+def create_gene_image_dataset_duplicates(number_of_genes, profiles, duplicates_number, tqdm_print = False):
     images = []
-    for gene_i in tqdm(range(int(profiles.shape[1]/ number_of_genes))):
-        gene_image = get_single_gene_duplicates(number_of_genes, profiles, gene_i * number_of_genes, duplicates_number)
-        images.append(gene_image)
+    if tqdm_print:
+        for gene_i in tqdm(range(int(profiles.shape[1]/ number_of_genes))):
+            gene_image = get_single_gene_duplicates(number_of_genes, profiles, gene_i * number_of_genes, duplicates_number)
+            images.append(gene_image)
+    else:
+        for gene_i in (range(int(profiles.shape[1]/ number_of_genes))):
+            gene_image = get_single_gene_duplicates(number_of_genes, profiles, gene_i * number_of_genes, duplicates_number)
+            images.append(gene_image)
     
-    print('Gene shape', np.array(images).shape)
+    # print('Gene shape', np.array(images).shape)
     # pdb.set_trace()
     return np.array(images)
 

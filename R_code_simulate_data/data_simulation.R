@@ -1,19 +1,33 @@
 library(knitrProgressBar)
+# install.packages("knitrProgressBar")
 library(parallel)
 library(ape)
+# install.packages("ape")
+library(gplots)
+# install.packages("gplots")
+library(evolCCM)
 # install.packages("devtools")
 #library(devtools)
 #devtools::install_github("beiko-lab/evolCCM")
 # install.packages("progress")
 library(progress)
 
+random_seeds = c(78572, 12321, 23123, 26675)
+random_seed = random_seeds[4]
 
+print(random_seed)
+set.seed(random_seed)
 
+t_s = 2000 # tree size
 
 start_number_of_genes = 5
 end_number_of_genes = 5
 
-simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_names) {
+sim_tree = rtree(n = t_s) # generate a random 100-tip tree
+# rescale branch length to 0.1
+sim_tree$edge.length = sim_tree$edge.length / mean(sim_tree$edge.length) * 0.1
+
+simulation_profiles <- function(sim_tree2, file_id, n, t_s, per_runs, folder_path, all_names) {
   library(evolCCM)
   library(ape)
   library(knitrProgressBar)
@@ -30,10 +44,10 @@ simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_name
   runs_in_one_loop = 2500
   generations = per_runs / runs_in_one_loop 
   
-  line = c(1, 0,	1,	0,	0,	1,	0,	0	,0, 1) * 2
-  two_triangles = c(1	,1	,1,	0,	0,	1,	0,	0,	1,	1) * 2
-  star = c(0	,1,	1,	0,	0,	1,	0	,0	,1,	0) * 2
-  full_connected = c(1,	1,	1,	1,	1,	1,	1,	1,	1,	1) * 2
+  #line = c(1, 0,	1,	0,	0,	1,	0,	0	,0, 1) * 2
+  #two_triangles = c(1	,1	,1,	0,	0,	1,	0,	0,	1,	1) * 2
+  #star = c(0	,1,	1,	0,	0,	1,	0	,0	,1,	0) * 2
+  #full_connected = c(1,	1,	1,	1,	1,	1,	1,	1,	1,	1) * 2
 
   
   for (number_of_files in 1:generations){
@@ -45,7 +59,6 @@ simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_name
         update_progress(set_kpb)
       }
       
-      t_s = 100 # tree size
       sim_tree = rtree(n = t_s) # generate a random 100-tip tree
       # rescale branch length to 0.1
       sim_tree$edge.length = sim_tree$edge.length / mean(sim_tree$edge.length) * 0.1
@@ -60,22 +73,21 @@ simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_name
       # A mixture distribitoni of point mass at zero and uniform(-1, 1) 
       # p = 0.3 to be 0, and 0.7 stay the same
       
-      b12 = runif(choose(n,2), -1, 1)
+      b12 = runif(choose(n,2), -1.5, 1.5)
       #b12 <- ifelse(runif(length(b12), 0, 1) < 0.3, 0, b12)
       
       #b12 = star
       
-      
       B[upper.tri(B)] <- b12
       B[lower.tri(B)] <- t(B)[lower.tri(B)]
-      diag(B) = runif(n, -0.3,0.3)
+      diag(B) = runif(n, -0.5,0.5)
+
       # save rates
       rates[i,] = c(alpha, diag(B), B[upper.tri(B)]) 
       # simulate profiles
       simDF = SimulateProfiles(sim_tree, alpha, B)
       profiles[, i*n - (n-1):0] = as.matrix(simDF) # store profiles
     }
-    
     
     # print(head(rates))
     # print(head(profiles))
@@ -97,33 +109,32 @@ simulation_profiles <- function(file_id, n, t_s, per_runs, folder_path, all_name
 }
 
 
-# kpb_watch <- watch_progress_mp(2000, watch_location = "/scratch/zjia/multiprocess/progress_file.log")
+# kpb_watch <- watch_progress_mp(2000, watch_location = " /scratch/h/honggu/zeshengj/CNN/data/simulations_data/progress_file.log")
 
-
-
-
-set.seed(78506572)
-#set.seed(123)
-t_s = 100 # tree size
 #sim_tree = rtree(n = t_s) # generate a random 100-tip tree
 # rescale branch length to 0.1
 #sim_tree$edge.length = sim_tree$edge.length / mean(sim_tree$edge.length) * 0.1
 
 
 for (number_of_gens in start_number_of_genes:end_number_of_genes){
-  n_runs = 40 # number of simulations
-  per_runs = 50000 # number of simulations per run
+  n_runs = detectCores() # number of simulations
+  per_runs = 20000 # number of simulations per run
   n = number_of_gens # number of genes in community
   # save results
-  print(n)
+  print(paste("Number of Genes:", n))
+  print(paste("Number of Cores:", detectCores()))
   
   timestamp <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
   
+ 
+
   # Specify the path for the new folder
-  folder_path <-sprintf("/scratch/zjia/multiprocess/uniform_random_tree_%d_genes_%d_records_%s", n, n_runs * per_runs, timestamp)
+  folder_path <-sprintf("/scratch/h/honggu/zeshengj/CNN/data/simulations_data/%d_tips_tree_seed_%d_%d_genes_%d_records_%s",t_s,  random_seed, n, n_runs * per_runs, timestamp)
   raw_data_path <- paste0(folder_path, '/raw_data')
   rates_path <- paste0(folder_path,'/raw_data/rates')
   profile_path <-paste0(folder_path, '/raw_data/profiles')
+  
+  
   
   # Create the folder
   dir.create(folder_path)
@@ -169,18 +180,18 @@ for (number_of_gens in start_number_of_genes:end_number_of_genes){
   
   # Create 40 sets of parameters where x and y are random numbers
   for (i in 1:n_runs) {
-    params[[i]] <- list(file_id = i, n = n, t_s = t_s, per_runs = per_runs, folder_path = folder_path, all_names = all_names)
+    params[[i]] <- list(sim_tree = sim_tree, file_id = i, n = n, t_s = t_s, per_runs = per_runs, folder_path = folder_path, all_names = all_names)
   }
   
   # Initialize cluster
-  cl <- makeCluster(detectCores())
+  cl <- makeCluster(n_runs)
   
   # Export function to all cluster nodes
   clusterExport(cl, c("simulation_profiles"))
   
   # Execute function in parallel
   results <- parLapply(cl, params, function(params) {
-    simulation_profiles(params$file_id, params$n, params$t_s, params$per_runs, params$folder_path, params$all_names)
+    simulation_profiles(params$sim_tree, params$file_id, params$n, params$t_s, params$per_runs, params$folder_path, params$all_names)
   })
   
   # Stop cluster

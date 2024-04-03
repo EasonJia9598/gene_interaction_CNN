@@ -162,7 +162,7 @@ class ResNet(nn.Module):
         # self.linear_layer_1 = nn.Linear(1024, out_features=128)
         # self.linear_layer_2 = nn.Linear(128, out_features=128)
         # self.linear_layer_3 = nn.Linear(128, out_features=128)
-        self.dropout2 = nn.Dropout(0.2)
+        # self.dropout2 = nn.Dropout(0.2)
         self.fcend = nn.Linear(1024, num_classes)
 
     def forward(self,x):

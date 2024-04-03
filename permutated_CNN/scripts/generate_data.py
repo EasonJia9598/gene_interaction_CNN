@@ -19,6 +19,8 @@ def main():
     parser.add_argument('--total_files_to_convert', type=int, default=32, help='total files to convert')
     parser.add_argument('--gene_image_type', type=int, default=0, help='gene image type, 0 for permutated gene images, 1 for duplicates gene images')
     parser.add_argument('--number_of_genes', type=int, default=6, help='number of genes')
+    parser.add_argument('--image_width', type=int, default=6, help='image_width')
+
 
     args = parser.parse_args()
 
@@ -43,7 +45,7 @@ def main():
 
     print("############################################################################")
     print("Data Generation Started")
-    print(f"Directory: {directory} ")
+    print(f"Directory: {directory}")
     print(f"Profile File Name Pattern: {profile_file_name_pattern}")
     print(f"Rates File Name Pattern: {rates_file_name_pattern}")
     print(f"Number of Profiles in One Gene Image Array: {number_of_profiles_in_one_gene_image_array}")
@@ -52,7 +54,7 @@ def main():
     if cut_off_files:
         print(f"Total Files to Convert: {total_files_to_convert}")
     print("############################################################################")
-    data_generation(args.number_of_genes, directory, profile_file_name_pattern, rates_file_name_pattern, number_of_profiles_in_one_gene_image_array, generatin_type, cut_off_files, total_files_to_convert, gene_image_type)
+    data_generation(args.image_width, args.number_of_genes, directory, profile_file_name_pattern, rates_file_name_pattern, number_of_profiles_in_one_gene_image_array, generatin_type, cut_off_files, total_files_to_convert, gene_image_type)
 
 
 

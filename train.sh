@@ -1,19 +1,19 @@
-python ./permutated_CNN/scripts/train.py \
-    --main_dir /media/eeepc/3866FF5566FF127C/400_genes/400_tips_tree_100_genes_400000_records_2024_03_01_12_46_07  \
-    --temperary_ssd_dr /home/eeepc/Documents/random_tree/code_base/temperary_data_saver/100_genes \
-    --load_model_checkpoint 0 \
-    --model_checkpoint_path none\
+python /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/train.py \
+    --main_dir /scratch/h/honggu/zeshengj/CNN/data/100_tips_tree_40_genes_8000000_records_2024_03_12_10_39_00  \
+    --if_use_temperary_ssd 0\
+    --temperary_ssd_dr /scratch/h/honggu/zeshengj/CNN/data/100_tips_tree_40_genes_1200000_records_2024_03_08_08_16_15/temperary_folder \
+    --load_model_checkpoint 1 \
+    --model_checkpoint_path /scratch/h/honggu/zeshengj/CNN/data/100_tips_tree_40_genes_8000000_records_2024_03_12_10_39_00/model_checkpoints/03_14_21_11_21_100_genes_ResNet50_2e-5/batch_best_model_0.677.pth \
     --epochs 100000 \
-    --batch_size 16 \
-    --num_outputs 4950 \
-    --sub_training_batch 10\
+    --batch_size 512 \
+    --num_outputs 780 \
+    --sub_training_batch 2\
     --input_gene_image_size "1, 400, 200" \
     --gene_image_type 1 \
-    --log_file_name "100_genes_ResNet50_2e-5" \
+    --log_file_name "2nd_40_genes_ResBet50_batch_512_sub_batch_1_1e-4" \
     --model_type "ResNet" \
-    --ResNet_depth 34 \
+    --ResNet_depth 50 \
     --learning_rate 1e-4 \
-
 
 # gene_image_type 1 for duplicates images, 0 for permutated images
 # python ./permutated_CNN/scripts/train.py \
