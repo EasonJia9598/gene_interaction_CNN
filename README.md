@@ -275,12 +275,12 @@ Create a folder called such name for saving the logs
 "ResNet" for creating a ResNet model
 "CNN" for creating a normal CNN model
 - `--ResNet_depth 152 `
-Define ResNet depth.
-1. 18 for ResNet 18
-2. 34
-3. 50
-4. 101
-5. 152
+    Define ResNet depth.
+    * 18 for ResNet 18
+    *  34
+    * 50
+    * 101
+    * 152
 - `--learning_rate 1e-4 `
 Define the corresponding Learning Rate  
 
