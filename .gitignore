@@ -4,3 +4,7 @@ temperary_data_saver/*
 R_code_simulate_data/prediction/*
 R_code_simulate_data/simulated_data/*
 slurm*
+checker.ipynb
+mirror_statistics.ipynb
+predictions.csv
+train.sh
