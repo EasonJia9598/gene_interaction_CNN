@@ -45,7 +45,7 @@ def main():
 
     print("############################################################################")
     print("Data Generation Started")
-    print(f"Directory: {directory}")
+    print(f"Directory is : {directory}")
     print(f"Profile File Name Pattern: {profile_file_name_pattern}")
     print(f"Rates File Name Pattern: {rates_file_name_pattern}")
     print(f"Number of Profiles in One Gene Image Array: {number_of_profiles_in_one_gene_image_array}")

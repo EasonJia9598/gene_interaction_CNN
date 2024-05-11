@@ -215,8 +215,8 @@ def combine_rates(directory, file_name_pattern, number_of_rates_in_one_gene_imag
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
 
         evaluate_agent_partial = partial(parallel_concatenate_gene_rates, saving_folder=saving_folder)
-        with Pool(80) as pool:
-            pool.starmap(evaluate_agent_partial, [(agent_id, sub_files, raw_data_path, _epochs) for agent_id in range(80)])
+        with Pool(40) as pool:
+            pool.starmap(evaluate_agent_partial, [(agent_id, sub_files, raw_data_path, _epochs) for agent_id in range(40)])
         #
             
         # concatenate_gene_rates(sub_files, raw_data_path, _epochs, saving_folder)
@@ -302,8 +302,8 @@ def create_duplicates_gene_images(image_width, number_of_genes, directory, profi
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
         evaluate_agent_partial = partial(parallel_concatenate_duplicates_gene_profiles, saving_folder=saving_folder)
-        with Pool(80) as pool:
-            pool.starmap(evaluate_agent_partial, [(image_width, agent_id, number_of_genes, sub_files, raw_data_path, _epochs) for agent_id in range(80)])
+        with Pool(40) as pool:
+            pool.starmap(evaluate_agent_partial, [(image_width, agent_id, number_of_genes, sub_files, raw_data_path, _epochs) for agent_id in range(40)])
         # concatenate_duplicates_gene_profiles(number_of_genes, sub_files, raw_data_path, _epochs, saving_folder)
 
     # In case there are more files than the number of gene arrays
