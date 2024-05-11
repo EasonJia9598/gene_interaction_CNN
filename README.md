@@ -42,7 +42,7 @@ torch.device("cuda" if torch.cuda.is_available() else "cpu")
 Install our Package
 
 ```
-cd /scratch/h/honggu/zeshengj/CNN/
+cd /******/zeshengj/CNN/
 pip install -e .
 ```
 
@@ -61,7 +61,7 @@ By the following reasons.
 
 ```Shell
 python ./permutated_CNN/scripts/generate_data.py \
-    --directory /scratch/h/honggu/zeshengj/CNN/data/demo \
+    --directory /scratch/******/zeshengj/CNN/data/demo \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 32 \
@@ -94,11 +94,11 @@ parser.add_argument('--number_of_genes', type=int, default=0, help='Number of ge
 
 ```Shell
 python ./permutated_CNN/scripts/train.py \
-    --main_dir /scratch/h/honggu/zeshengj/CNN/data/demo  \
+    --main_dir /scratch/******/zeshengj/CNN/data/demo  \
     --if_use_temperary_ssd 0\
-    --temperary_ssd_dr /scratch/h/honggu/zeshengj/CNN/data/demo/temp \
+    --temperary_ssd_dr /scratch/******/zeshengj/CNN/data/demo/temp \
     --load_model_checkpoint 0 \
-    --model_checkpoint_path /scratch/h/honggu/ze_shengj/CNN/model_checkpoints/m.pth\
+    --model_checkpoint_path /scratch/******/zeshengj/CNN/model_checkpoints/m.pth\
     --epochs 100000 \
     --batch_size 256 \
     --num_outputs 780 \
@@ -164,11 +164,11 @@ train_jobs.sh
 #SBATCH --gpus-per-node=1
 #SBATCH --time=0:15:0
 #SBATCH --job-name data_generation_job
-#SBATCH --output=/scratch/h/honggu/zeshengj/logs/data_generation_output_%j.txt
+#SBATCH --output=/scratch/******/zeshengj/logs/data_generation_output_%j.txt
 
 module load anaconda3
 source activate genes_env
-sh /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/train.sh
+sh /scratch/******/zeshengj/CNN/gene_corelation_CNN/train.sh
 ```
 
 Submit job into the queue.
