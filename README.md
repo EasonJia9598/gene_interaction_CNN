@@ -242,46 +242,46 @@ python ./permutated_CNN/scripts/train.py \
     --learning_rate 1e-4 \
 ```
 
-##### --main_dir:
+- `--main_dir`:
 The mian directory contains the files from R data simulation
-##### --if_use_temperary_ssd
+- `--if_use_temperary_ssd`
 Sometimes, we use external hard driver or HDD to contain the large data files. But the loading time from those disks are slower than SSD. If we have extra SSD, then we can copy some of those large files in advance to the SSD. And the program will iteratively load the most recent need data files during the training, and delete those files after training that batch of files.
 
 	0 for not use temperary SSD
 	1 for using it
-##### --temperaray_ssd_dr
+- `--temperaray_ssd_dr`
 If the previous setting is 1, then define the ssd directory path.
-##### --load_model_checkpoint
+- `--load_model_checkpoint`
 0 for not loading model checkpoints and create a new model.
 1 for loading a model checkpoint
-##### --model_checkpoint_path
+- `--model_checkpoint_path`
 define the model checkpoint path location
-##### --epochs 100000 
+- `--epochs 100000 `
 Number of epochs during the training
-##### --batch_size 256 
+- `--batch_size 256` 
 Number of images in one batch in GPU. Depends on your GPU memory size.
-##### --num_outputs 780 
+- `--num_outputs 780 `
 Number of Betas in the output. If we have 5 genes, then 5 choose 2 = 10. And if we have 40 genes, then 40 choose 2 = 780.
-##### --sub_training_batch 3
+- `--sub_training_batch 3`
 For the scenario when we don't have enough memory to contain all the data files. Then we sub batch train the data. For example, we have 1.2 million dataset, we will divide them into 14 batches with 80K data in each batch. And for each batch, we train the model with 3 epoches.
-##### --input_gene_image_size "1, 400, 200" 
+- `--input_gene_image_size "1, 400, 200" `
 For the genes image size
-##### --gene_image_type 1 
+- `--gene_image_type 1 `
 1 for duplicates images
 0 for permutated images
-##### --log_file_name "100_genes_ResNet50_2e-5" 
+- `--log_file_name "100_genes_ResNet50_2e-5" `
 Create a folder called such name for saving the logs
-##### --model_type "ResNet" 
+- `--model_type "ResNet" `
 "ResNet" for creating a ResNet model
 "CNN" for creating a normal CNN model
-##### --ResNet_depth 152 
+- `--ResNet_depth 152 `
 Define ResNet depth.
 1. 18 for ResNet 18
 2. 34
 3. 50
 4. 101
 5. 152
-##### --learning_rate 1e-4 
+- `--learning_rate 1e-4 `
 Define the corresponding Learning Rate  
 
 
