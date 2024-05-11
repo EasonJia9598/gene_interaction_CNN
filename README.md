@@ -153,7 +153,7 @@ Rscript /scratch/***/R_code_simulate_data/data_simulation.R
 ```
 
 
-##Run the CNN image data generation by
+## Run the CNN image data generation by
 
 ```
 ./data_generation.sh
