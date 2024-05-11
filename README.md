@@ -1,4 +1,4 @@
-# Implementation of thesis: 
+# Implementation of my thesis: 
 ## Author: Zesheng Jia
 ## STUDY OF GENES INTERACTION RELATIONSHIPS USING REGRESSION CONVOLUTIONAL NEURAL NETWORKS WITH HYPOTHESIS TESTING ON LARGE-SCALE SELF-SIMULATED GENE PROFILES WITH EMBEDDED PHYLOGENETIC TREE STRUCTURES, Zesheng Jia
 
@@ -49,7 +49,9 @@ As you are in the virtualenv now, you can just type ```pip install <required mod
 
 To go back to the normal python installation simply type
 
+   ```
    deactivate
+   ```
 
 # Mist Cluster Instructions
 > The Mist system is a cluster of 54 IBM servers each with 4 NVIDIA V100 “Volta” GPUs with 32 GB memory each, and with NVLINKs in between. Each node of the cluster has 256GB RAM. It has InfiniBand EDR interconnection providing GPU-Direct RMDA capability. This system is a combination of the GPU extension to the Niagara cluster and the refresh of the GPU cluster of the Southern Ontario Smart Computing Innovation Platform (SOSCIP). The Niagara GPU portion is available to Compute Canada users, while the SOSCIP portion will be used by allocated SOSCIP projects. By combining the resources, users from either group are able to take advantage of any unused computing resources of the other group. https://www.scinethpc.ca/mist/
