@@ -17,6 +17,11 @@ per_runs = 25000 # number of simulations per run
 runs_in_one_loop = 2500
 t_s = 100 # tree size
 
+
+start_number_of_genes = 5
+end_number_of_genes = 5
+
+
 random_seeds = c(78572, 12321, 23123, 26675)
 random_seed = random_seeds[3]
 
@@ -24,9 +29,6 @@ print(random_seed)
 set.seed(random_seed)
 
 
-
-start_number_of_genes = 5
-end_number_of_genes = 5
 
 sim_tree = rtree(n = t_s) # generate a random 100-tip tree
 # rescale branch length to 0.1
