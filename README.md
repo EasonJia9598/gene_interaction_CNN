@@ -3,7 +3,9 @@
 # Training
 
 # Mist cluster Instructions
-## Zesheng Jia
+> The Mist system is a cluster of 54 IBM servers each with 4 NVIDIA V100 “Volta” GPUs with 32 GB memory each, and with NVLINKs in between. Each node of the cluster has 256GB RAM. It has InfiniBand EDR interconnection providing GPU-Direct RMDA capability. This system is a combination of the GPU extension to the Niagara cluster and the refresh of the GPU cluster of the Southern Ontario Smart Computing Innovation Platform (SOSCIP). The Niagara GPU portion is available to Compute Canada users, while the SOSCIP portion will be used by allocated SOSCIP projects. By combining the resources, users from either group are able to take advantage of any unused computing resources of the other group. https://www.scinethpc.ca/mist/
+
+## Author: Zesheng Jia
 ## For install packages
 
 ```Shell
@@ -42,8 +44,10 @@ torch.device("cuda" if torch.cuda.is_available() else "cpu")
 Install our Package
 
 ```
-cd /******/zeshengj/CNN/
+cd /******/zeshengj/gene_corelation_CNN/
+pip install -r requirements.txt
 pip install -e .
+
 ```
 
 For Mist Cluster, we need to manually install any packages in requirements from conda.
