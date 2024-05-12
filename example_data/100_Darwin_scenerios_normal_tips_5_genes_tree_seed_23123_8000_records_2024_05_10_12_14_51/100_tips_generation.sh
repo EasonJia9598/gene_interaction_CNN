@@ -11,7 +11,7 @@ module load NiaEnv/2019b python/3.11.5
 source ~/.virtualenvs/myenv/bin/activate
 
 python /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/generate_data.py \
-    --directory /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/example_data/100_Darwin_scenerios_normal_tips_5_genes_tree_seed_23123_8000_records_2024_05_10_12_14_51 \
+    --directory /****/zeshengj/CNN/gene_corelation_CNN/example_data/100_Darwin_scenerios_normal_tips_5_genes_tree_seed_23123_8000_records_2024_05_10_12_14_51 \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 4 \
