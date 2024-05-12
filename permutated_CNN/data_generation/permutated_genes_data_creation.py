@@ -338,7 +338,7 @@ def create_duplicates_gene_images(image_width, number_of_genes, directory, profi
 
     for _epochs in tqdm(range(number_of_gene_arrays)):
         sub_files = files[_epochs * num_batches: (_epochs + 1) * num_batches]
-        concatenate_duplicates_gene_profiles(number_of_genes, sub_files, raw_data_path, _epochs, saving_folder)
+        concatenate_duplicates_gene_profiles(image_width, number_of_genes, sub_files, raw_data_path, _epochs, saving_folder)
         
     # In case there are more files than the number of gene arrays
     if len(files) > number_of_gene_arrays * num_batches:
