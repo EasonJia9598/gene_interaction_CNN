@@ -8,8 +8,6 @@ def main():
     # import argparse
     parser = argparse.ArgumentParser(description='Data Generation')
     # add parser helper
-
-
     parser.add_argument('--directory', type=str, help='directory for the raw data')
     parser.add_argument('--profile_file_name_pattern', type=str, help='pattern for the profile file names')
     parser.add_argument('--rates_file_name_pattern', type=str, help='pattern for the rates file names')

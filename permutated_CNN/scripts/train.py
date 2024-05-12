@@ -18,19 +18,6 @@ import pyfiglet
 from datetime import datetime
 import subprocess
 
-# # Show progress bar when loading numpy data
-# def np_load_genome_data(file_path):
-#     blocksize = 5000  # tune this for performance/granularity
-#     try:
-#         mmap = np.load(file_path, mmap_mode='r')
-#         y = np.empty_like(mmap)
-#         n_blocks = int(np.ceil(mmap.shape[0] / blocksize))
-#         for b in tqdm(range(n_blocks)):
-#             # print('progress: {}/{}'.format(b, n_blocks))  # use any progress indicator
-#             y[b*blocksize : (b+1) * blocksize] = mmap[b*blocksize : (b+1) * blocksize]
-#     finally:
-#         del mmap  # make sure file is closed again
-#     return y
 
 def np_load_genome_data(file_path, chunks=None):
     blocksize = 1000  # tune this for performance/granularity
