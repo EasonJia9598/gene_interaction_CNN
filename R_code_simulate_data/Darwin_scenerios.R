@@ -1,3 +1,11 @@
+# install.packages("Rcpp")
+# install.packages("dendextend")
+# install.packages("ape", dependencies = T)
+# install.packages("gplots")
+# install.packages("progress")
+# install.packages("devtools", dependencies = T)
+# devtools::install_github("beiko-lab/evolCCM")
+
 library(knitrProgressBar)
 # install.packages("knitrProgressBar")
 library(parallel)

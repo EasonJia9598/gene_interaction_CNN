@@ -109,6 +109,18 @@ By the following reasons.
 
 # Data Simulation
 
+Potential needs for R environment:
+
+```R
+install.packages("Rcpp")
+install.packages("dendextend")
+install.packages("ape", dependencies = T)
+install.packages("gplots")
+install.packages("progress")
+install.packages("devtools", dependencies = T)
+devtools::install_github("beiko-lab/evolCCM")
+```
+
 In ./R_code_simulate_data/data_simulation.R file, 
 
 Adjust the following parameters for customized usage:
