@@ -7,4 +7,3 @@ slurm*
 checker.ipynb
 mirror_statistics.ipynb
 predictions.csv
-train.sh
