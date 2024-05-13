@@ -1,9 +1,9 @@
-python /****/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/train.py \
-    --main_dir /****/zeshengj/CNN/data/100_tips_tree_40_genes_8000000_records_2024_03_12_10_39_00  \
+python ./permutated_CNN/scripts/train.py \
+    --main_dir ./data/raw_data_folder  \
     --if_use_temperary_ssd 0\
-    --temperary_ssd_dr /****/zeshengj/CNN/data/100_tips_tree_40_genes_1200000_records_2024_03_08_08_16_15/temperary_folder \
+    --temperary_ssd_dr ./data/raw_data_folder/temperary_folder \
     --load_model_checkpoint 1 \
-    --model_checkpoint_path /****/zeshengj/CNN/data/100_tips_tree_40_genes_8000000_records_2024_03_12_10_39_00/model_checkpoints/03_14_21_11_21_100_genes_ResNet50_2e-5/batch_best_model_0.677.pth \
+    --model_checkpoint_path ./data/raw_data_folder/model_checkpoints/03_14_21_11_21_100_genes_ResNet50_2e-5/batch_best_model_0.677.pth \
     --epochs 100000 \
     --batch_size 512 \
     --num_outputs 780 \

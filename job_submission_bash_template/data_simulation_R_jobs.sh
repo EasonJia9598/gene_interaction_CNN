@@ -13,4 +13,4 @@ module load r/4.1.2
 
 source ~/.virtualenvs/R_env/bin/activate
 
-Rscript /****/zeshengj/CNN/gene_corelation_CNN/R_code_simulate_data/data_simulation.R
+Rscript ./R_code_simulate_data/data_simulation.R

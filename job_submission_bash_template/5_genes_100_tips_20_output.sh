@@ -10,8 +10,8 @@
 module load anaconda3
 source activate genes_env
 
-python /*****/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/train.py \
-    --main_dir /*****/zeshengj/CNN/data/simulations_data/100_normal_tips_5_genes_tree_seed_23123_2000000_records_2024_05_09_22_10_39 \
+python ./permutated_CNN/scripts/train.py \
+    --main_dir ./data/simulations_data/100_normal_tips_5_genes_tree_seed_23123_2000000_records_2024_05_09_22_10_39 \
     --if_use_temperary_ssd 0\
     --temperary_ssd_dr none \
     --load_model_checkpoint 0 \

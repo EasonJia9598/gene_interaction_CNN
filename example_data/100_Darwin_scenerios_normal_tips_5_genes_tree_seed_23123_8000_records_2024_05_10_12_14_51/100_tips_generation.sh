@@ -4,14 +4,14 @@
 #SBATCH --time=23:55:00
 #SBATCH --job-name data_generation_job
 #SBATCH --output=/scratch/h/honggu/zeshengj/logs/5_genes_100_normal_tips_100_image_data_generation_output_%j.txt
-#SBATCH --mail-user=zs549061@dal.ca
+#SBATCH --mail-user=zs*****@dal.ca
 #SBATCH --mail-type=ALL
 
 module load NiaEnv/2019b python/3.11.5
 source ~/.virtualenvs/myenv/bin/activate
 
-python /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/generate_data.py \
-    --directory /****/zeshengj/CNN/gene_corelation_CNN/example_data/100_Darwin_scenerios_normal_tips_5_genes_tree_seed_23123_8000_records_2024_05_10_12_14_51 \
+python ./permutated_CNN/scripts/generate_data.py \
+    --directory ./example_data/100_Darwin_scenerios_normal_tips_5_genes_tree_seed_23123_8000_records_2024_05_10_12_14_51 \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 4 \

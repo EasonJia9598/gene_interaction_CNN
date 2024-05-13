@@ -130,8 +130,14 @@ start_number_of_genes = 5
 end_number_of_genes = 5
 
 ```
-Run such bash file in Niagara Cluster for generate training data.
+Run such bash file in Niagara Cluster or local device for generate training data by
 
+```
+sh ./job_submission_bash_template/data_simulation_R_jobs.sh 
+
+or sh data_simulation.sh
+```
+As the following format:
 ```Shell
 
 #!/bin/bash 

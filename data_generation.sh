@@ -1,5 +1,5 @@
-python /scratch/h/honggu/zeshengj/CNN/gene_corelation_CNN/permutated_CNN/scripts/generate_data.py \
-    --directory /scratch/h/honggu/zeshengj/CNN/data/simulations_data/400_tips_10_genes_400_image_size \
+python ./permutated_CNN/scripts/generate_data.py \
+    --directory ./data/simulations_data/400_tips_10_genes_400_image_size \
     --profile_file_name_pattern profiles.csv \
     --rates_file_name_pattern rates.csv \
     --number_of_profiles_in_one_gene_image_array 16 \
