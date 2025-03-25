@@ -1,8 +1,4 @@
-# Implementation of my thesis: 
 ## Author: Zesheng Jia
-## STUDY OF GENES INTERACTION RELATIONSHIPS USING REGRESSION CONVOLUTIONAL NEURAL NETWORKS WITH HYPOTHESIS TESTING ON LARGE-SCALE SELF-SIMULATED GENE PROFILES WITH EMBEDDED PHYLOGENETIC TREE STRUCTURES, Zesheng Jia
-
-Link: https://www.mathstat.dal.ca/~tsusko/honours-theses/zesheng-jia.pdf
 
 ## Abstract: 
 In this study, we evaluated multiple deep learning models, including a simple feedforward neural network, a Convolutional Neural Network (CNN), and the ResNet
