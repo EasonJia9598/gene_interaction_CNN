@@ -1,4 +1,4 @@
-## Author: Zesheng Jia
+## Author: Ethan J.
 
 ## Abstract: 
 In this study, we evaluated multiple deep learning models, including a simple feedforward neural network, a Convolutional Neural Network (CNN), and the ResNet
